@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface PatientImagesProps {
   images: string[];
@@ -7,6 +7,14 @@ interface PatientImagesProps {
 export default function PatientImages({ images }: PatientImagesProps) {
   const [selected, setSelected] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && fullscreen) setFullscreen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [fullscreen]);
 
   if (!images || images.length === 0) {
     return (
@@ -19,7 +27,6 @@ export default function PatientImages({ images }: PatientImagesProps) {
   const current = images[selected];
   const isImage = current && /\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(current);
 
-  // Since images are stored as folder paths, show a note
   if (!isImage) {
     return (
       <div className="glass rounded-lg p-4">
@@ -28,9 +35,6 @@ export default function PatientImages({ images }: PatientImagesProps) {
         </h4>
         <p className="text-xs text-muted">
           Scans available in: {images.join(", ")}
-        </p>
-        <p className="text-xs text-muted mt-1">
-          Upload individual images via Admin Panel.
         </p>
       </div>
     );
@@ -42,53 +46,44 @@ export default function PatientImages({ images }: PatientImagesProps) {
         Patient Scans ({images.length})
       </h4>
 
-      <div className="relative">
-        <img
-          src={current}
-          alt={`Patient scan ${selected + 1}`}
-          className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-          onClick={() => setFullscreen(true)}
-        />
+      <img
+        src={current}
+        alt={`Patient scan ${selected + 1}`}
+        className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+        onDoubleClick={() => setFullscreen(true)}
+      />
 
-        {images.length > 1 && (
-          <div className="flex justify-between mt-2">
-            <button
-              onClick={() => setSelected((s) => (s - 1 + images.length) % images.length)}
-              className="text-xs text-muted hover:text-text px-2 py-1"
-              disabled={selected === 0}
-            >
-              ← Prev
-            </button>
-            <span className="text-xs text-muted">
-              {selected + 1} / {images.length}
-            </span>
-            <button
-              onClick={() => setSelected((s) => (s + 1) % images.length)}
-              className="text-xs text-muted hover:text-text px-2 py-1"
-              disabled={selected === images.length - 1}
-            >
-              Next →
-            </button>
-          </div>
-        )}
-      </div>
+      {images.length > 1 && (
+        <div className="flex justify-between mt-2">
+          <button
+            onClick={() => setSelected((s) => (s - 1 + images.length) % images.length)}
+            className="text-xs text-muted hover:text-text px-2 py-1"
+          >
+            ← Prev
+          </button>
+          <span className="text-xs text-muted">{selected + 1} / {images.length}</span>
+          <button
+            onClick={() => setSelected((s) => (s + 1) % images.length)}
+            className="text-xs text-muted hover:text-text px-2 py-1"
+          >
+            Next →
+          </button>
+        </div>
+      )}
 
       {fullscreen && (
         <div
           className="fixed inset-0 bg-bg/95 z-50 flex items-center justify-center p-8 cursor-pointer"
-          onClick={() => setFullscreen(false)}
+          onDoubleClick={() => setFullscreen(false)}
         >
-          <button
-            className="absolute top-4 right-4 text-muted hover:text-text text-sm"
-            onClick={() => setFullscreen(false)}
-          >
-            ✕ Close
-          </button>
           <img
             src={current}
             alt={`Patient scan ${selected + 1}`}
-            className="max-w-full max-h-full object-contain rounded-lg"
+            className="max-w-full max-h-full object-contain rounded-lg pointer-events-none"
           />
+          <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs text-muted">
+            Double-click or press Esc to close
+          </p>
         </div>
       )}
     </div>
