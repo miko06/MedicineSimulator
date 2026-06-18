@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum BodyZone {
+  HEAD
+  NECK
+  CHEST
+  ABDOMEN
+  BACK
+  LEFT_ARM
+  RIGHT_ARM
+  LEFT_HAND
+  RIGHT_HAND
+  LEFT_LEG
+  RIGHT_LEG
+  LEFT_FOOT
+  RIGHT_FOOT
+  PELVIS
+  SKIN
+  EYES
+  EARS
+  NOSE
+  MOUTH
+  THROAT
+  FULL_BODY
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  displayName  String    @default("")
+  institution  String    @default("")
+  role         UserRole  @default(STUDENT)
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  attempts         Attempt[]
+  createdExercises Exercise[] @relation("ExerciseCreator")
+
+  @@map("users")
+}
+
+model Specialty {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  nameEn    String
+  nameRu    String
+  nameKz    String   @default("")
+  icon      String   @default("🩺")
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  exercises Exercise[]
+  diagnoses Diagnosis[]
+
+  @@map("specialties")
+}
+
+model Symptom {
+  id            String   @id @default(uuid())
+  nameEn        String
+  nameRu        String
+  nameKz        String   @default("")
+  bodyZone      BodyZone
+  severity      Int      @default(1)
+  color         String   @default("#EF4444")
+  descriptionEn String   @default("")
+  descriptionRu String   @default("")
+  descriptionKz String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  exerciseSymptoms ExerciseSymptom[]
+
+  @@map("symptoms")
+}
+
+model Diagnosis {
+  id            String   @id @default(uuid())
+  nameEn        String
+  nameRu        String
+  nameKz        String   @default("")
+  descriptionEn String   @default("")
+  descriptionRu String   @default("")
+  descriptionKz String   @default("")
+  treatmentsEn  Json     @default("[]")
+  treatmentsRu  Json     @default("[]")
+  treatmentsKz  Json     @default("[]")
+  specialtyId   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  specialty         Specialty          @relation(fields: [specialtyId], references: [id])
+  exerciseDiagnoses ExerciseDiagnosis[]
+
+  @@map("diagnoses")
+}
+
+model RobotPreset {
+  id            String   @id @default(uuid())
+  modelVersion  String   @default("1.0")
+  zoneOverrides Json     @default("[]")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  exercises Exercise[]
+
+  @@map("robot_presets")
+}
+
+model Exercise {
+  id            String     @id @default(uuid())
+  specialtyId   String
+  titleEn       String
+  titleRu       String
+  titleKz       String     @default("")
+  descriptionEn String     @default("")
+  descriptionRu String     @default("")
+  descriptionKz String     @default("")
+  difficulty    Difficulty @default(BEGINNER)
+  images        Json       @default("[]")
+  patientVoice  Json       @default("{}")
+  robotPresetId String
+  createdById   String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  specialty         Specialty           @relation(fields: [specialtyId], references: [id])
+  robotPreset       RobotPreset         @relation(fields: [robotPresetId], references: [id])
+  createdBy         User                @relation("ExerciseCreator", fields: [createdById], references: [id])
+  exerciseSymptoms  ExerciseSymptom[]
+  exerciseDiagnoses ExerciseDiagnosis[]
+  attempts          Attempt[]
+
+  @@map("exercises")
+}
+
+model ExerciseSymptom {
+  exerciseId String
+  symptomId  String
+
+  exercise Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  symptom  Symptom  @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+
+  @@id([exerciseId, symptomId])
+  @@map("exercise_symptoms")
+}
+
+model ExerciseDiagnosis {
+  exerciseId  String
+  diagnosisId String
+  isCorrect   Boolean  @default(false)
+
+  exercise  Exercise  @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  diagnosis Diagnosis @relation(fields: [diagnosisId], references: [id], onDelete: Cascade)
+
+  @@id([exerciseId, diagnosisId])
+  @@map("exercise_diagnoses")
+}
+
+model Attempt {
+  id         String        @id @default(uuid())
+  userId     String
+  exerciseId String
+  status     AttemptStatus @default(IN_PROGRESS)
+  score      Int           @default(0)
+  timeSpent  Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  user     User            @relation(fields: [userId], references: [id])
+  exercise Exercise        @relation(fields: [exerciseId], references: [id])
+  answers  AttemptAnswer[]
+
+  @@map("attempts")
+}
+
+model AttemptAnswer {
+  id          String   @id @default(uuid())
+  attemptId   String
+  diagnosisId String
+  isCorrect   Boolean  @default(false)
+  answeredAt  DateTime @default(now())
+
+  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@map("attempt_answers")
+}
