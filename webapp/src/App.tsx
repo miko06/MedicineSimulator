@@ -7,6 +7,9 @@ import ExerciseList from "./pages/student/ExerciseList";
 import ExerciseDetail from "./pages/student/ExerciseDetail";
 import Progress from "./pages/student/Progress";
 import ProfilePage from "./pages/student/Profile";
+import AIDashboard from "./pages/student/AIDashboard";
+import ErrorHistory from "./pages/student/ErrorHistory";
+import DiagnosisHistory from "./pages/student/DiagnosisHistory";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminExercises from "./pages/admin/Exercises";
 import AdminUsers from "./pages/admin/Users";
@@ -19,7 +22,7 @@ function ProtectedRoute({ children, role }: { children: React.ReactNode; role?: 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen text-muted text-sm">
-        Loading...
+        Жүктелуде...
       </div>
     );
   }
@@ -44,6 +47,9 @@ export default function App() {
           <Route path="/exercises/:id" element={<ProtectedRoute><ExerciseDetail /></ProtectedRoute>} />
           <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/ai" element={<ProtectedRoute><AIDashboard /></ProtectedRoute>} />
+          <Route path="/history/errors" element={<ProtectedRoute><ErrorHistory /></ProtectedRoute>} />
+          <Route path="/history/diagnoses" element={<ProtectedRoute><DiagnosisHistory /></ProtectedRoute>} />
 
           <Route path="/admin" element={<ProtectedRoute role="ADMIN"><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/exercises" element={<ProtectedRoute role="ADMIN"><AdminExercises /></ProtectedRoute>} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../../api/client";
 import { useLocale } from "../../hooks/useLocale";
+import { kzDifficulty } from "../../lib/i18n";
 
 interface ExerciseCard {
   id: string;
@@ -59,11 +60,11 @@ export default function ExerciseList() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <Link to="/dashboard" className="text-xs text-muted hover:text-text mb-4 inline-block transition-colors">
-        ← Dashboard
+        ← Басты бет
       </Link>
 
       <h1 className="text-xl font-mono text-accent mb-6">
-        {specialtySlug ? specialties.find((s) => s.slug === specialtySlug)?.name ?? specialtySlug : "All Exercises"}
+        {specialtySlug ? specialties.find((s) => s.slug === specialtySlug)?.name ?? specialtySlug : "Барлық жаттығулар"}
       </h1>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
@@ -72,7 +73,7 @@ export default function ExerciseList() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search exercises..."
+            placeholder="Жаттығуларды іздеу..."
             className="w-full bg-surface border border-border rounded px-3 py-2 text-sm text-text placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
           />
         </form>
@@ -82,10 +83,10 @@ export default function ExerciseList() {
           onChange={(e) => setDifficulty(e.target.value)}
           className="bg-surface border border-border rounded px-3 py-2 text-sm text-text focus:outline-none focus:border-accent cursor-pointer"
         >
-          <option value="">All levels</option>
-          <option value="BEGINNER">Beginner</option>
-          <option value="INTERMEDIATE">Intermediate</option>
-          <option value="ADVANCED">Advanced</option>
+          <option value="">Барлық деңгейлер</option>
+          <option value="BEGINNER">Қарапайым</option>
+          <option value="INTERMEDIATE">Орташа</option>
+          <option value="ADVANCED">Күрделі</option>
         </select>
       </div>
 
@@ -95,7 +96,7 @@ export default function ExerciseList() {
             to="/exercises"
             className="text-xs px-3 py-1.5 rounded glass text-accent border-accent/30"
           >
-            All
+            Барлығы
           </Link>
           {specialties.map((s) => (
             <Link
@@ -110,10 +111,10 @@ export default function ExerciseList() {
       )}
 
       {loading ? (
-        <div className="text-center text-muted text-sm py-20">Loading...</div>
+        <div className="text-center text-muted text-sm py-20">Жүктелуде...</div>
       ) : exercises.length === 0 ? (
         <div className="text-center text-muted text-sm py-20">
-          No exercises found. Try a different filter.
+          Жаттығулар табылмады. Басқа сүзгі қолданып көріңіз.
         </div>
       ) : (
         <>
@@ -134,7 +135,7 @@ export default function ExerciseList() {
                           : "bg-red-400/10 text-red-400"
                     }`}
                   >
-                    {ex.difficulty}
+                    {kzDifficulty(ex.difficulty)}
                   </span>
                   <span className="text-xs text-muted">{ex.specialty.name}</span>
                 </div>
@@ -143,9 +144,9 @@ export default function ExerciseList() {
                 </h3>
                 <p className="text-xs text-muted mt-1 line-clamp-2">{ex.description}</p>
                 <div className="flex items-center gap-3 mt-3 text-xs text-muted">
-                  <span>{ex.symptomsCount} symptoms</span>
-                  <span>{ex.diagnosesCount} diagnoses</span>
-                  <span>{ex.attemptsCount} attempts</span>
+                  <span>{ex.symptomsCount} белгі</span>
+                  <span>{ex.diagnosesCount} диагноз</span>
+                  <span>{ex.attemptsCount} әрекет</span>
                 </div>
               </Link>
             ))}

@@ -1,16 +1,35 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { api } from "../../api/client";
+import ActivityGrid from "../../components/ActivityGrid";
 
 export default function ProfilePage() {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<{ displayName: string; institution: string }>({ displayName: "", institution: "" });
+  const [profile, setProfile] = useState({
+    firstName: "", lastName: "", course: "",
+    displayName: "", institution: "",
+  });
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [attempts, setAttempts] = useState<Array<{ createdAt: string; score: number }>>([]);
 
   useEffect(() => {
     api.auth.me().then((data) => {
-      setProfile({ displayName: (data.user as Record<string, string>).displayName || "", institution: (data.user as Record<string, string>).institution || "" });
+      const u = data.user as Record<string, string>;
+      setProfile({
+        firstName: u.firstName || "",
+        lastName: u.lastName || "",
+        course: u.course || "",
+        displayName: u.displayName || "",
+        institution: u.institution || "",
+      });
+    }).catch(() => {});
+
+    api.progress.get().then((data) => {
+      setAttempts(data.recentAttempts.map((a) => ({
+        createdAt: a.createdAt,
+        score: a.score,
+      })));
     }).catch(() => {});
   }, []);
 
@@ -28,42 +47,58 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto px-6 py-8">
-      <h1 className="text-xl font-mono text-accent mb-8">Profile</h1>
+    <div className="max-w-2xl mx-auto px-6 py-8">
+      <h1 className="text-xl font-mono text-accent mb-8">Профиль</h1>
 
-      <div className="glass rounded-xl p-6 space-y-4">
-        <div>
-          <label className="text-xs text-muted block mb-1">Email</label>
-          <p className="text-sm text-text">{user?.email}</p>
-        </div>
-        <div>
-          <label className="text-xs text-muted block mb-1">Role</label>
-          <p className="text-sm text-text font-mono">{user?.role}</p>
-        </div>
-        <div>
-          <label className="text-xs text-muted block mb-1">Display Name</label>
-          {editing ? (
-            <input className="w-full bg-surface border border-border rounded px-3 py-2 text-sm text-text outline-none focus:border-accent" value={profile.displayName} onChange={e => setProfile({...profile, displayName: e.target.value})} />
-          ) : (
-            <p className="text-sm text-text">{profile.displayName || "—"}</p>
-          )}
-        </div>
-        <div>
-          <label className="text-xs text-muted block mb-1">Institution</label>
-          {editing ? (
-            <input className="w-full bg-surface border border-border rounded px-3 py-2 text-sm text-text outline-none focus:border-accent" value={profile.institution} onChange={e => setProfile({...profile, institution: e.target.value})} />
-          ) : (
-            <p className="text-sm text-text">{profile.institution || "—"}</p>
-          )}
-        </div>
-        {editing ? (
-          <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving} className="bg-accent text-bg rounded px-4 py-2 text-sm">{saving ? "Saving..." : "Save"}</button>
-            <button onClick={() => setEditing(false)} className="text-muted text-sm hover:text-text">Cancel</button>
+      <div className="space-y-6">
+        <div className="glass rounded-xl p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-muted block mb-1">Аты</label>
+              {editing ? (
+                <input className="w-full bg-surface border border-border rounded px-3 py-2 text-sm text-text outline-none focus:border-accent" value={profile.firstName} onChange={e => setProfile({...profile, firstName: e.target.value})} />
+              ) : (
+                <p className="text-sm text-text">{profile.firstName || "—"}</p>
+              )}
+            </div>
+            <div>
+              <label className="text-xs text-muted block mb-1">Тегі</label>
+              {editing ? (
+                <input className="w-full bg-surface border border-border rounded px-3 py-2 text-sm text-text outline-none focus:border-accent" value={profile.lastName} onChange={e => setProfile({...profile, lastName: e.target.value})} />
+              ) : (
+                <p className="text-sm text-text">{profile.lastName || "—"}</p>
+              )}
+            </div>
           </div>
-        ) : (
-          <button onClick={() => setEditing(true)} className="text-accent text-sm hover:underline">Edit</button>
-        )}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs text-muted block mb-1">Курс</label>
+              {editing ? (
+                <input className="w-full bg-surface border border-border rounded px-3 py-2 text-sm text-text outline-none focus:border-accent" value={profile.course} onChange={e => setProfile({...profile, course: e.target.value})} placeholder="мысалы, 4-ші курс" />
+              ) : (
+                <p className="text-sm text-text">{profile.course || "—"}</p>
+              )}
+            </div>
+            <div>
+              <label className="text-xs text-muted block mb-1">Электрондық пошта</label>
+              <p className="text-sm text-muted">{user?.email}</p>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-muted block mb-1">Рөл</label>
+            <p className="text-sm text-text font-mono">{user?.role === "ADMIN" ? "Әкімші" : "Студент"}</p>
+          </div>
+          {editing ? (
+            <div className="flex gap-3">
+              <button onClick={handleSave} disabled={saving} className="bg-accent text-bg rounded px-4 py-2 text-sm">{saving ? "Сақталуда..." : "Сақтау"}</button>
+              <button onClick={() => setEditing(false)} className="text-muted text-sm hover:text-text">Болдырмау</button>
+            </div>
+          ) : (
+            <button onClick={() => setEditing(true)} className="text-accent text-sm hover:underline">Өңдеу</button>
+          )}
+        </div>
+
+        <ActivityGrid attempts={attempts} />
       </div>
     </div>
   );

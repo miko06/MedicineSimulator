@@ -176,6 +176,92 @@ export const progressModule = new Elysia({ prefix: "/api/progress" })
       },
     };
   })
+  .get("/error-history", async ({ currentUser, query }) => {
+    const limit = Math.min(
+      50,
+      Math.max(1, parseInt(query?.limit ?? "20", 10))
+    );
+
+    const attempts = await prisma.attempt.findMany({
+      where: { userId: currentUser.id, status: "COMPLETED" },
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        exercise: {
+          select: {
+            id: true,
+            titleEn: true,
+            titleRu: true,
+            titleKz: true,
+            difficulty: true,
+            specialty: {
+              select: { slug: true, nameEn: true, nameRu: true, nameKz: true },
+            },
+            exerciseDiagnoses: {
+              include: {
+                diagnosis: {
+                  select: {
+                    id: true,
+                    nameEn: true,
+                    nameRu: true,
+                    nameKz: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        answers: {
+          select: { diagnosisId: true, isCorrect: true, answeredAt: true },
+          orderBy: { answeredAt: "desc" },
+        },
+      },
+    });
+
+    const data = attempts
+      .filter(
+        (a) => a.score < 100 || a.answers.some((ans) => !ans.isCorrect)
+      )
+      .map((a) => {
+        const diagnosisById = new Map(
+          a.exercise.exerciseDiagnoses.map((ed) => [ed.diagnosisId, ed.diagnosis])
+        );
+        const correct = a.exercise.exerciseDiagnoses.find((ed) => ed.isCorrect)
+          ?.diagnosis ?? null;
+
+        return {
+          id: a.id,
+          score: a.score,
+          status: a.status,
+          createdAt: a.createdAt,
+          updatedAt: a.updatedAt,
+          exercise: {
+            id: a.exercise.id,
+            title:
+              a.exercise.titleKz || a.exercise.titleRu || a.exercise.titleEn,
+            difficulty: a.exercise.difficulty,
+            specialty: a.exercise.specialty,
+          },
+          answers: a.answers.map((ans) => ({
+            diagnosisId: ans.diagnosisId,
+            diagnosisName:
+              diagnosisById.get(ans.diagnosisId)?.nameKz ||
+              diagnosisById.get(ans.diagnosisId)?.nameRu ||
+              diagnosisById.get(ans.diagnosisId)?.nameEn ||
+              "Белгісіз",
+            isCorrect: ans.isCorrect,
+          })),
+          correctDiagnosis: correct
+            ? {
+                id: correct.id,
+                name: correct.nameKz || correct.nameRu || correct.nameEn,
+              }
+            : null,
+        };
+      });
+
+    return { attempts: data };
+  })
   .get("/leaderboard", async ({ query }) => {
     const limit = Math.min(100, Math.max(1, parseInt(query?.limit ?? "10", 10)));
     const specialtySlug = query?.specialty as string | undefined;

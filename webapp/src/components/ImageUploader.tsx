@@ -56,14 +56,14 @@ export default function ImageUploader({ images, exerciseId, onImagesChange }: Im
     <div>
       <div className="flex items-center justify-between mb-2">
         <h4 className="text-xs font-mono text-muted uppercase tracking-wider">
-          Patient Images ({images.length})
+          Талдау суреттері ({images.length})
         </h4>
         <button
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
           className="text-xs text-accent hover:underline"
         >
-          {uploading ? "Uploading..." : "+ Add"}
+          {uploading ? "Жүктелуде..." : "+ Қосу"}
         </button>
       </div>
 
@@ -86,7 +86,7 @@ export default function ImageUploader({ images, exerciseId, onImagesChange }: Im
       >
         {images.length === 0 ? (
           <p className="text-xs text-muted">
-            Drop images here or click <span className="text-accent cursor-pointer" onClick={() => inputRef.current?.click()}>+ Add</span>
+            Суреттерді осы жерге тасыңыз немесе <span className="text-accent cursor-pointer" onClick={() => inputRef.current?.click()}>+ Қосу</span> басыңыз
           </p>
         ) : (
           <div className="grid grid-cols-3 gap-2">
@@ -94,7 +94,7 @@ export default function ImageUploader({ images, exerciseId, onImagesChange }: Im
               <div key={i} className="relative group">
                 <img
                   src={img}
-                  alt={`Scan ${i + 1}`}
+                  alt={`Сурет ${i + 1}`}
                   className="w-full h-20 object-cover rounded"
                 />
                 <button

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { api, type ProgressData } from "../../api/client";
 import { useLocale } from "../../hooks/useLocale";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
@@ -8,12 +9,23 @@ const COLORS = ["#888888", "#AAAAAA", "#CCCCCC", "#666666", "#999999", "#BBBBBB"
 export default function Progress() {
   const [progress, setProgress] = useState<ProgressData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { version } = useLocale();
 
   useEffect(() => {
     api.progress.get().then(setProgress).finally(() => setLoading(false));
   }, [version]);
+
+  const copyId = async (id: string) => {
+    try {
+      await navigator.clipboard.writeText(id);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 1500);
+    } catch {
+      // ignore
+    }
+  };
 
   if (loading) return <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">Loading...</div>;
   if (!progress) return null;
@@ -28,19 +40,25 @@ export default function Progress() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
-      <h1 className="text-xl font-mono text-accent mb-8">Progress Dashboard</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-xl font-mono text-accent">Прогресс</h1>
+        <div className="flex items-center gap-4">
+          <Link to="/history/errors" className="text-xs text-muted hover:text-text transition-colors">Қателер тарихы →</Link>
+          <Link to="/ai" className="text-xs text-muted hover:text-text transition-colors">ЖИ зертханасына өту →</Link>
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Total" value={String(summary.totalAttempts)} />
-        <StatCard label="Completed" value={String(summary.completedAttempts)} />
-        <StatCard label="Avg Score" value={`${summary.averageScore}%`} />
-        <StatCard label="Best" value={`${summary.bestScore}%`} />
+        <StatCard label="Барлығы" value={String(summary.totalAttempts)} />
+        <StatCard label="Аяқталды" value={String(summary.completedAttempts)} />
+        <StatCard label="Орташа балл" value={`${summary.averageScore}%`} />
+        <StatCard label="Ең жақсы" value={`${summary.bestScore}%`} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {pieData.length > 0 && (
           <div className="glass rounded-xl p-6">
-            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Exercises by Specialty</h3>
+            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Мамандықтар бойынша жаттығулар</h3>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value">
@@ -54,7 +72,7 @@ export default function Progress() {
 
         {barData.length > 0 && (
           <div className="glass rounded-xl p-6">
-            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Performance by Specialty</h3>
+            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Мамандықтар бойынша нәтиже</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={barData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -70,7 +88,7 @@ export default function Progress() {
 
       {lineData.length > 1 && (
         <div className="glass rounded-xl p-6 mb-8">
-          <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Recent Score Trend</h3>
+          <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Соңғы балл динамикасы</h3>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -84,14 +102,16 @@ export default function Progress() {
       )}
 
       <div className="glass rounded-xl overflow-hidden">
-        <h3 className="text-xs font-mono text-muted uppercase tracking-wider px-4 py-3 border-b border-border">Recent Attempts</h3>
+        <h3 className="text-xs font-mono text-muted uppercase tracking-wider px-4 py-3 border-b border-border">Соңғы әрекеттер</h3>
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left">
-              <th className="px-4 py-2 text-xs text-muted font-normal">Exercise</th>
-              <th className="px-4 py-2 text-xs text-muted font-normal">Specialty</th>
-              <th className="px-4 py-2 text-xs text-muted font-normal">Score</th>
-              <th className="px-4 py-2 text-xs text-muted font-normal">Status</th>
+              <th className="px-4 py-2 text-xs text-muted font-normal">Жаттығу</th>
+              <th className="px-4 py-2 text-xs text-muted font-normal">Мамандық</th>
+              <th className="px-4 py-2 text-xs text-muted font-normal">Балл</th>
+              <th className="px-4 py-2 text-xs text-muted font-normal">Күй</th>
+              <th className="px-4 py-2 text-xs text-muted font-normal">Әрекет идентификаторы</th>
+              <th className="px-4 py-2 text-xs text-muted font-normal"></th>
             </tr>
           </thead>
           <tbody>
@@ -101,7 +121,28 @@ export default function Progress() {
                 <td className="px-4 py-2.5 text-muted">{a.specialty}</td>
                 <td className="px-4 py-2.5 font-mono">{a.score}%</td>
                 <td className="px-4 py-2.5">
-                  <span className={`text-xs ${a.status === "COMPLETED" ? "text-green-400" : "text-yellow-400"}`}>{a.status}</span>
+                  <span className={`text-xs ${a.status === "COMPLETED" ? "text-green-400" : "text-yellow-400"}`}>
+                    {a.status === "COMPLETED" ? "Аяқталды" : "Белсенді"}
+                  </span>
+                </td>
+                <td className="px-4 py-2.5">
+                  <button
+                    onClick={() => copyId(a.id)}
+                    className="font-mono text-xs text-muted hover:text-accent transition-colors"
+                    title="Толық идентификаторды көшіру"
+                  >
+                    {a.id.slice(0, 8)}… {copiedId === a.id ? "көшірілді" : "көшіру"}
+                  </button>
+                </td>
+                <td className="px-4 py-2.5">
+                  {a.status === "COMPLETED" && a.score < 100 && (
+                    <Link
+                      to={`/ai?tab=errors&attempt=${a.id}`}
+                      className="text-xs text-accent hover:underline"
+                    >
+                      Қатені талдау →
+                    </Link>
+                  )}
                 </td>
               </tr>
             ))}

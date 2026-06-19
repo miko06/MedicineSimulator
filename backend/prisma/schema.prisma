@@ -52,6 +52,10 @@ model User {
   id           String    @id @default(uuid())
   email        String    @unique
   passwordHash String
+  firstName    String    @default("")
+  lastName     String    @default("")
+  course       String    @default("")
+  emailVerified Boolean  @default(false)
   displayName  String    @default("")
   institution  String    @default("")
   role         UserRole  @default(STUDENT)
@@ -61,6 +65,8 @@ model User {
 
   attempts         Attempt[]
   createdExercises Exercise[] @relation("ExerciseCreator")
+  aiConversations  AiConversation[]
+  aiDiagnoses      AiDiagnosis[]
 
   @@map("users")
 }
@@ -83,18 +89,19 @@ model Specialty {
 }
 
 model Symptom {
-  id            String   @id @default(uuid())
-  nameEn        String
-  nameRu        String
-  nameKz        String   @default("")
-  bodyZone      BodyZone
-  severity      Int      @default(1)
-  color         String   @default("#EF4444")
-  descriptionEn String   @default("")
-  descriptionRu String   @default("")
-  descriptionKz String   @default("")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id              String   @id @default(uuid())
+  nameEn          String
+  nameRu          String
+  nameKz          String   @default("")
+  bodyZone        BodyZone
+  severity        Int      @default(1)
+  color           String   @default("#EF4444")
+  descriptionEn   String   @default("")
+  descriptionRu   String   @default("")
+  descriptionKz   String   @default("")
+  attachments     Json     @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   exerciseSymptoms ExerciseSymptom[]
 
@@ -143,8 +150,12 @@ model Exercise {
   descriptionEn String     @default("")
   descriptionRu String     @default("")
   descriptionKz String     @default("")
-  difficulty    Difficulty @default(BEGINNER)
-  images        Json       @default("[]")
+  difficulty       Difficulty @default(BEGINNER)
+  patientAge       String     @default("")
+  patientGender    String     @default("")
+  patientHistory  String     @default("")
+  testSteps       Json       @default("[]")
+  images          Json       @default("[]")
   patientVoice  Json       @default("{}")
   robotPresetId String
   createdById   String
@@ -211,4 +222,30 @@ model AttemptAnswer {
   attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 
   @@map("attempt_answers")
+}
+
+model AiConversation {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String   @default("New Chat")
+  messages  Json     @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("ai_conversations")
+}
+
+model AiDiagnosis {
+  id        String   @id @default(uuid())
+  userId    String
+  symptoms  String   @default("")
+  notes     String   @default("")
+  result    String   @default("")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("ai_diagnoses")
 }

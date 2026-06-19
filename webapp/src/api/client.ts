@@ -7,7 +7,7 @@ interface ApiOptions {
 }
 
 async function request<T>(url: string, options: ApiOptions = {}): Promise<T> {
-  const locale = localStorage.getItem("locale") || "en";
+  const locale = localStorage.getItem("locale") || "kz";
   const res = await fetch(`${API_BASE}${url}`, {
     method: options.method ?? "GET",
     headers: {
@@ -40,10 +40,10 @@ export class ApiError extends Error {
 
 export const api = {
   auth: {
-    register: (email: string, password: string) =>
+    register: (email: string, password: string, firstName?: string, lastName?: string, course?: string) =>
       request<{ user: { id: string; email: string; role: string } }>("/auth/register", {
         method: "POST",
-        body: { email, password },
+        body: { email, password, firstName, lastName, course },
       }),
     login: (email: string, password: string) =>
       request<{ user: { id: string; email: string; role: string } }>("/auth/login", {
@@ -83,10 +83,30 @@ export const api = {
       const qs = params ? "?" + new URLSearchParams(params).toString() : "";
       return request<{ data: unknown[]; pagination: { total: number } }>(`/progress/history${qs}`);
     },
+    errorHistory: (limit = 20) =>
+      request<{ attempts: ErrorAttempt[] }>(`/progress/error-history?limit=${limit}`),
     leaderboard: (limit = 10, specialty?: string) => {
       const qs = specialty ? `?limit=${limit}&specialty=${specialty}` : `?limit=${limit}`;
       return request<{ leaderboard: Array<{ userId: string; email: string; averageScore: number; completedCount: number }> }>(`/progress/leaderboard${qs}`);
     },
+  },
+
+  ai: {
+    analyzeError: (attemptId: string) =>
+      request<{ reply: string }>("/ai/analyze-error", {
+        method: "POST",
+        body: { attemptId },
+      }),
+    diagnoses: () =>
+      request<{
+        diagnoses: Array<{
+          id: string;
+          symptoms: string;
+          notes: string;
+          result: string;
+          createdAt: string;
+        }>;
+      }>("/ai/diagnoses"),
   },
 
   admin: {
@@ -148,9 +168,19 @@ export interface ExerciseDetail {
     severity: number;
     color: string;
     description: string;
+    attachments: Array<{ name: string; path: string }>;
   }>;
   diagnosesCount: number;
   diagnoses: Array<{ id: string; name: string }>;
+  patientAge: string;
+  patientGender: string;
+  patientHistory: string;
+  testSteps: Array<{
+    type: string;
+    title: string;
+    options: string[];
+    correctIndex: number;
+  }>;
   images: string[];
 }
 
@@ -197,6 +227,31 @@ export interface ProgressData {
     timeSpent: number;
     createdAt: string;
   }>;
+}
+
+export interface ErrorAttempt {
+  id: string;
+  score: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  exercise: {
+    id: string;
+    title: string;
+    difficulty: string;
+    specialty: {
+      slug: string;
+      nameEn: string;
+      nameRu: string;
+      nameKz: string;
+    };
+  };
+  answers: Array<{
+    diagnosisId: string;
+    diagnosisName: string;
+    isCorrect: boolean;
+  }>;
+  correctDiagnosis: { id: string; name: string } | null;
 }
 
 export interface AdminDashboard {

@@ -96,6 +96,41 @@ export const exercisesModule = new Elysia({ prefix: "/api/exercises" })
 
     if (!exercise) throw new NotFoundError("Exercise");
 
+    // Auto-generate test steps if empty
+    let testSteps = exercise.testSteps as Array<{type:string;title:string;options:string[];correctIndex:number}> | undefined;
+    if (!testSteps || (testSteps as any).length === 0) {
+      const diagnoses = exercise.exerciseDiagnoses;
+      if (diagnoses.length >= 2) {
+        const correctDiag = diagnoses.find(d => d.isCorrect)?.diagnosis;
+        const wrongDiags = diagnoses.filter(d => !d.isCorrect).map(d => d.diagnosis);
+        const allOptions = diagnoses.map(d => {
+          const desc = loc(locale, d.diagnosis.descriptionEn, d.diagnosis.descriptionRu, d.diagnosis.descriptionKz);
+          return desc;
+        });
+        const correctIdx = diagnoses.findIndex(d => d.isCorrect);
+
+        const treatments = (correctDiag ? (loc(locale, "", (correctDiag.treatmentsRu as string[] || []).join(", "), "") || (correctDiag.treatmentsEn as string[] || []).join(", ")) : "").split(", ").filter(Boolean);
+
+        testSteps = [{
+          type: "diagnosis",
+          title: loc(locale, "Select the correct diagnosis", "Выберите правильный диагноз", "Дұрыс диагнозды таңдаңыз"),
+          options: allOptions,
+          correctIndex: correctIdx >= 0 ? correctIdx : 0,
+        }];
+
+        if (treatments.length >= 2) {
+          const correctTx = treatments[0]!;
+          const wrongTx = ["Observation only", "Symptomatic treatment", "No treatment needed"];
+          testSteps.push({
+            type: "treatment",
+            title: loc(locale, "Choose the correct treatment", "Выберите правильное лечение", "Дұрыс емдеуді таңдаңыз"),
+            options: [correctTx, ...wrongTx.slice(0, 3)],
+            correctIndex: 0,
+          });
+        }
+      }
+    }
+
     return {
       id: exercise.id,
       title: loc(locale, exercise.titleEn, exercise.titleRu, exercise.titleKz),
@@ -117,12 +152,17 @@ export const exercisesModule = new Elysia({ prefix: "/api/exercises" })
         severity: es.symptom.severity,
         color: es.symptom.color,
         description: loc(locale, es.symptom.descriptionEn, es.symptom.descriptionRu, es.symptom.descriptionKz),
+        attachments: es.symptom.attachments,
       })),
       diagnosesCount: exercise.exerciseDiagnoses.length,
       diagnoses: exercise.exerciseDiagnoses.map((ed) => ({
         id: ed.diagnosis.id,
         name: loc(locale, ed.diagnosis.nameEn, ed.diagnosis.nameRu, ed.diagnosis.nameKz),
       })),
+      patientAge: exercise.patientAge,
+      patientGender: exercise.patientGender,
+      patientHistory: exercise.patientHistory,
+      testSteps: testSteps,
       images: exercise.images,
     };
   })

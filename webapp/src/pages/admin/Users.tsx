@@ -39,28 +39,28 @@ export default function AdminUsers() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm("Delete this user permanently?")) return;
+    if (!confirm("Бұл пайдаланушыны өшіру керек пе?")) return;
     await api.admin.users.delete(userId);
     load(page);
   };
 
   const totalPages = Math.ceil(total / 20);
 
-  if (loading) return <div className="text-muted text-sm p-8">Loading...</div>;
+  if (loading) return <div className="text-muted text-sm p-8">Жүктелуде...</div>;
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
-      <h1 className="text-xl font-mono text-accent mb-6">Users ({total})</h1>
+      <h1 className="text-xl font-mono text-accent mb-6">Пайдаланушылар ({total})</h1>
 
       <div className="glass rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-left">
-              <th className="px-4 py-3 text-xs text-muted font-normal">Email</th>
-              <th className="px-4 py-3 text-xs text-muted font-normal">Role</th>
-              <th className="px-4 py-3 text-xs text-muted font-normal">Status</th>
-              <th className="px-4 py-3 text-xs text-muted font-normal">Attempts</th>
-              <th className="px-4 py-3 text-xs text-muted font-normal text-right">Actions</th>
+              <th className="px-4 py-3 text-xs text-muted font-normal">Электрондық пошта</th>
+              <th className="px-4 py-3 text-xs text-muted font-normal">Рөл</th>
+              <th className="px-4 py-3 text-xs text-muted font-normal">Күй</th>
+              <th className="px-4 py-3 text-xs text-muted font-normal">Әрекеттер</th>
+              <th className="px-4 py-3 text-xs text-muted font-normal text-right">Әрекеттер</th>
             </tr>
           </thead>
           <tbody>
@@ -69,17 +69,17 @@ export default function AdminUsers() {
                 <td className="px-4 py-3 text-text">{u.email}</td>
                 <td className="px-4 py-3">
                   <button onClick={() => toggleRole(u)} className={`text-xs px-2 py-0.5 rounded cursor-pointer ${u.role === "ADMIN" ? "bg-accent/10 text-accent" : "text-muted"}`}>
-                    {u.role}
+                    {u.role === "ADMIN" ? "Әкімші" : "Студент"}
                   </button>
                 </td>
                 <td className="px-4 py-3">
                   <button onClick={() => toggleActive(u.id)} className={`text-xs ${u.isActive ? "text-green-400" : "text-red-400"}`}>
-                    {u.isActive ? "Active" : "Blocked"}
+                    {u.isActive ? "Белсенді" : "Бұғатталған"}
                   </button>
                 </td>
                 <td className="px-4 py-3 text-muted text-xs">{u._count?.attempts ?? 0}</td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleDelete(u.id)} className="text-xs text-red-400 hover:text-red-300">Delete</button>
+                  <button onClick={() => handleDelete(u.id)} className="text-xs text-red-400 hover:text-red-300">Жою</button>
                 </td>
               </tr>
             ))}

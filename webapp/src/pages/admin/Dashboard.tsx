@@ -18,24 +18,24 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
-      <h1 className="text-xl font-mono text-accent mb-8">Admin Panel</h1>
+      <h1 className="text-xl font-mono text-accent mb-8">Әкімші панелі</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <StatCard label="Students" value={String(data.users.students)} />
-        <StatCard label="Admins" value={String(data.users.admins)} />
-        <StatCard label="Exercises" value={String(data.content.exercises)} />
-        <StatCard label="Avg Score" value={`${data.attempts.averageScore}%`} />
+        <StatCard label="Студенттер" value={String(data.users.students)} />
+        <StatCard label="Әкімшілер" value={String(data.users.admins)} />
+        <StatCard label="Жаттығулар" value={String(data.content.exercises)} />
+        <StatCard label="Орташа балл" value={`${data.attempts.averageScore}%`} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <div>
-          <h2 className="text-xs font-mono text-muted uppercase tracking-wider mb-3">Exercises by Specialty</h2>
+          <h2 className="text-xs font-mono text-muted uppercase tracking-wider mb-3">Мамандықтар бойынша жаттығулар</h2>
           <div className="glass rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left">
-                  <th className="px-4 py-2 text-xs text-muted font-normal">Specialty</th>
-                  <th className="px-4 py-2 text-xs text-muted font-normal text-right">Count</th>
+                  <th className="px-4 py-2 text-xs text-muted font-normal">Мамандық</th>
+                  <th className="px-4 py-2 text-xs text-muted font-normal text-right">Сан</th>
                 </tr>
               </thead>
               <tbody>
@@ -51,14 +51,14 @@ export default function AdminDashboard() {
         </div>
 
         <div>
-          <h2 className="text-xs font-mono text-muted uppercase tracking-wider mb-3">Recent Activity</h2>
+          <h2 className="text-xs font-mono text-muted uppercase tracking-wider mb-3">Соңғы белсенділік</h2>
           <div className="glass rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border text-left">
-                  <th className="px-4 py-2 text-xs text-muted font-normal">User</th>
-                  <th className="px-4 py-2 text-xs text-muted font-normal">Exercise</th>
-                  <th className="px-4 py-2 text-xs text-muted font-normal text-right">Score</th>
+                  <th className="px-4 py-2 text-xs text-muted font-normal">Пайдаланушы</th>
+                  <th className="px-4 py-2 text-xs text-muted font-normal">Жаттығу</th>
+                  <th className="px-4 py-2 text-xs text-muted font-normal text-right">Балл</th>
                 </tr>
               </thead>
               <tbody>
@@ -80,10 +80,10 @@ export default function AdminDashboard() {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Link to="/admin/exercises" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Manage Exercises →</Link>
-        <Link to="/admin/symptoms" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Manage Symptoms →</Link>
-        <Link to="/admin/diagnoses" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Manage Diagnoses →</Link>
-        <Link to="/admin/users" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Manage Users →</Link>
+        <Link to="/admin/exercises" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Жаттығуларды басқару →</Link>
+        <Link to="/admin/symptoms" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Белгілерді басқару →</Link>
+        <Link to="/admin/diagnoses" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Диагноздарды басқару →</Link>
+        <Link to="/admin/users" className="glass rounded-lg px-4 py-2.5 text-sm hover:border-accent/30 transition-all">Пайдаланушыларды басқару →</Link>
       </div>
     </div>
   );

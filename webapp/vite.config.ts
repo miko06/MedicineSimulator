@@ -12,7 +12,17 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api": "http://localhost:8080",
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+        configure: (proxy) => {
+          proxy.on("proxyReq", (_proxyReq, req) => {
+            if (req.url?.includes("/chat/stream")) {
+              req.headers["accept"] = "text/event-stream";
+            }
+          });
+        },
+      },
     },
   },
 });

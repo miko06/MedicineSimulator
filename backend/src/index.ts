@@ -11,6 +11,7 @@ import { adminDiagnosesModule } from "./modules/diagnoses/admin";
 import { adminExercisesModule } from "./modules/exercises/admin";
 import { adminUploadsModule } from "./modules/exercises/upload";
 import { voiceModule } from "./modules/exercises/voice";
+import { aiModule } from "./modules/ai";
 import { exercisesModule } from "./modules/exercises";
 import { attemptsModule } from "./modules/attempts";
 import { progressModule } from "./modules/progress";
@@ -50,6 +51,7 @@ const app = new Elysia()
   .use(adminExercisesModule)
   .use(adminUploadsModule)
   .use(voiceModule)
+  .use(aiModule)
   .use(adminUsersModule)
   .use(adminDashboardModule)
   .use(adminProgressModule)

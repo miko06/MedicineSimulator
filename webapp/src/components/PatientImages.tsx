@@ -19,7 +19,7 @@ export default function PatientImages({ images }: PatientImagesProps) {
   if (!images || images.length === 0) {
     return (
       <div className="glass rounded-lg p-4 text-center text-xs text-muted">
-        No patient images available for this case
+        Бұл жағдай бойынша науқас суреттері жоқ
       </div>
     );
   }
@@ -31,10 +31,10 @@ export default function PatientImages({ images }: PatientImagesProps) {
     return (
       <div className="glass rounded-lg p-4">
         <h4 className="text-xs font-mono text-muted uppercase tracking-wider mb-2">
-          Patient Scans
+          Науқас суреттері
         </h4>
         <p className="text-xs text-muted">
-          Scans available in: {images.join(", ")}
+          Қолжетімді суреттер: {images.join(", ")}
         </p>
       </div>
     );
@@ -43,7 +43,7 @@ export default function PatientImages({ images }: PatientImagesProps) {
   return (
     <div className="glass rounded-lg p-4">
       <h4 className="text-xs font-mono text-muted uppercase tracking-wider mb-3">
-        Patient Scans ({images.length})
+        Науқас суреттері ({images.length})
       </h4>
 
       <img
@@ -59,14 +59,14 @@ export default function PatientImages({ images }: PatientImagesProps) {
             onClick={() => setSelected((s) => (s - 1 + images.length) % images.length)}
             className="text-xs text-muted hover:text-text px-2 py-1"
           >
-            ← Prev
+            ← Алд.
           </button>
           <span className="text-xs text-muted">{selected + 1} / {images.length}</span>
           <button
             onClick={() => setSelected((s) => (s + 1) % images.length)}
             className="text-xs text-muted hover:text-text px-2 py-1"
           >
-            Next →
+            Кел. →
           </button>
         </div>
       )}
@@ -82,7 +82,7 @@ export default function PatientImages({ images }: PatientImagesProps) {
             className="max-w-full max-h-full object-contain rounded-lg pointer-events-none"
           />
           <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-xs text-muted">
-            Double-click or press Esc to close
+            Жабу үшін екі рет басыңыз немесе Esc басыңыз
           </p>
         </div>
       )}

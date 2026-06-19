@@ -80,19 +80,19 @@ export default function VoicePlayer({ exerciseId }: VoicePlayerProps) {
       onClick={handleClick}
       disabled={loading}
       className="glass rounded-lg px-4 py-2.5 flex items-center gap-2 text-sm hover:border-accent/30 transition-all disabled:opacity-50 w-full justify-center"
-      title={error ? "Voice unavailable for this exercise" : playing ? "Stop" : "Listen to patient"}
+      title={error ? "Бұл жаттығу үшін дыбыс қолжетімсіз" : playing ? "Тоқтату" : "Науқастың дауысын тыңдау"}
     >
       {loading ? (
         <>
           <span className="w-4 h-4 border-2 border-muted border-t-accent rounded-full animate-spin" />
-          <span className="text-muted">Generating voice...</span>
+          <span className="text-muted">Дыбыс дайындалуда...</span>
         </>
       ) : error ? (
         <>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polygon points="5,3 19,12 5,21" fill="currentColor" />
           </svg>
-          <span className="text-muted">Voice unavailable</span>
+          <span className="text-muted">Дыбыс қолжетімсіз</span>
         </>
       ) : playing ? (
         <>
@@ -100,14 +100,14 @@ export default function VoicePlayer({ exerciseId }: VoicePlayerProps) {
             <rect x="6" y="4" width="4" height="16" rx="1" />
             <rect x="14" y="4" width="4" height="16" rx="1" />
           </svg>
-          <span className="text-accent">Stop</span>
+          <span className="text-accent">Тоқтату</span>
         </>
       ) : (
         <>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polygon points="5,3 19,12 5,21" fill="currentColor" />
           </svg>
-          <span className="text-text">Listen to patient</span>
+          <span className="text-text">Науқастың дауысын тыңдау</span>
         </>
       )}
     </button>

@@ -2,8 +2,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 
 export type Locale = "en" | "ru" | "kz";
 
-const LABELS: Record<Locale, string> = { en: "EN", ru: "RU", kz: "KZ" };
-const LOCALES: Locale[] = ["en", "ru", "kz"];
+const LABELS: Record<Locale, string> = { en: "EN", ru: "RU", kz: "KK" };
+const LOCALES: Locale[] = ["kz", "ru", "en"];
 
 interface LocaleContextType {
   locale: Locale;
@@ -23,7 +23,7 @@ const LocaleContext = createContext<LocaleContextType>({
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
-    return (localStorage.getItem("locale") as Locale) || "en";
+    return (localStorage.getItem("locale") as Locale) || "kz";
   });
   const [version, setVersion] = useState(0);
 

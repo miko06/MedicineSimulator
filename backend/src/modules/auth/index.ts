@@ -28,6 +28,9 @@ export const authModule = new Elysia({ prefix: "/api/auth" })
         data: {
           email: body.email,
           passwordHash,
+          firstName: body.firstName ?? "",
+          lastName: body.lastName ?? "",
+          course: body.course ?? "",
         },
       });
 
@@ -68,6 +71,9 @@ export const authModule = new Elysia({ prefix: "/api/auth" })
           id: user.id,
           email: user.email,
           role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          course: user.course,
         },
       };
     },
@@ -75,6 +81,9 @@ export const authModule = new Elysia({ prefix: "/api/auth" })
       body: t.Object({
         email: t.String({ format: "email" }),
         password: t.String({ minLength: 6 }),
+        firstName: t.Optional(t.String()),
+        lastName: t.Optional(t.String()),
+        course: t.Optional(t.String()),
       }),
     }
   )
@@ -190,8 +199,12 @@ export const authModule = new Elysia({ prefix: "/api/auth" })
       select: {
         id: true,
         email: true,
+        firstName: true,
+        lastName: true,
+        course: true,
         displayName: true,
         institution: true,
+        emailVerified: true,
         role: true,
         createdAt: true,
       },
@@ -209,21 +222,24 @@ export const authModule = new Elysia({ prefix: "/api/auth" })
       data: {
         displayName: body.displayName,
         institution: body.institution,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        course: body.course,
       },
       select: {
-        id: true,
-        email: true,
-        displayName: true,
-        institution: true,
-        role: true,
+        id: true, email: true, firstName: true, lastName: true,
+        course: true, displayName: true, institution: true,
+        emailVerified: true, role: true,
       },
     });
-
     return { user };
   },
   {
     body: t.Object({
       displayName: t.Optional(t.String()),
       institution: t.Optional(t.String()),
+      firstName: t.Optional(t.String()),
+      lastName: t.Optional(t.String()),
+      course: t.Optional(t.String()),
     }),
   });

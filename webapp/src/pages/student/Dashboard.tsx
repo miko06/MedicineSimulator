@@ -32,20 +32,20 @@ export default function StudentDashboard() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-xl font-mono text-accent mb-1">Welcome, {user?.email}</h1>
-        <p className="text-sm text-muted">Select a specialty to start practicing</p>
+        <h1 className="text-xl font-mono text-accent mb-1">Қош келдіңіз, {user?.email}</h1>
+        <p className="text-sm text-muted">Жаттығуды бастау үшін мамандықты таңдаңыз</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-10">
-        <StatCard label="Completed" value={String(totalDone)} sub={`of ${totalAll}`} />
-        <StatCard label="Avg Score" value={`${avgScore}%`} />
-        <StatCard label="Specialties" value={String(specialties.length)} />
+        <StatCard label="Аяқталды" value={String(totalDone)} sub={`/${totalAll}`} />
+        <StatCard label="Орташа балл" value={`${avgScore}%`} />
+        <StatCard label="Мамандықтар" value={String(specialties.length)} />
       </div>
 
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-mono text-muted uppercase tracking-wider">Specialties</h2>
-          <Link to="/progress" className="text-xs text-muted hover:text-text transition-colors">View progress →</Link>
+          <h2 className="text-sm font-mono text-muted uppercase tracking-wider">Мамандықтар</h2>
+          <Link to="/progress" className="text-xs text-muted hover:text-text transition-colors">Прогрессті көру →</Link>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -57,13 +57,13 @@ export default function StudentDashboard() {
             >
               <span className="text-2xl">{s.icon}</span>
               <h3 className="text-sm text-text mt-2 group-hover:text-accent transition-colors">{s.name}</h3>
-              <p className="text-xs text-muted mt-1">{s.exerciseCount} exercises</p>
+              <p className="text-xs text-muted mt-1">{s.exerciseCount} жаттығу</p>
             </Link>
           ))}
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {

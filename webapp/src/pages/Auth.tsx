@@ -15,6 +15,9 @@ export default function AuthPage() {
   // Register form
   const [regEmail, setRegEmail] = useState("");
   const [regPass, setRegPass] = useState("");
+  const [regFirstName, setRegFirstName] = useState("");
+  const [regLastName, setRegLastName] = useState("");
+  const [regCourse, setRegCourse] = useState("");
   const [regError, setRegError] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -24,7 +27,7 @@ export default function AuthPage() {
       await login(loginEmail, loginPass);
       navigate("/dashboard");
     } catch (err) {
-      setLoginError(err instanceof Error ? err.message : "Login failed");
+      setLoginError(err instanceof Error ? err.message : "Кіру сәтсіз аяқталды");
     }
   };
 
@@ -32,10 +35,10 @@ export default function AuthPage() {
     e.preventDefault();
     setRegError("");
     try {
-      await register(regEmail, regPass);
+      await register(regEmail, regPass, regFirstName, regLastName, regCourse);
       navigate("/dashboard");
     } catch (err) {
-      setRegError(err instanceof Error ? err.message : "Registration failed");
+      setRegError(err instanceof Error ? err.message : "Тіркеу сәтсіз аяқталды");
     }
   };
 
@@ -45,50 +48,72 @@ export default function AuthPage() {
         {/* Sign In Form */}
         <div className="form-panel sign-in">
           <form onSubmit={handleLogin}>
-            <h1 className="text-2xl font-mono text-accent mb-4">Sign In</h1>
-            <span>use your email and password</span>
+            <h1 className="text-2xl font-mono text-accent mb-4">Кіру</h1>
+            <span>Электрондық поштаңыз бен құпия сөзіңізді қолданыңыз</span>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Электрондық пошта"
               value={loginEmail}
               onChange={(e) => setLoginEmail(e.target.value)}
               required
             />
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Құпия сөз"
               value={loginPass}
               onChange={(e) => setLoginPass(e.target.value)}
               required
             />
             {loginError && <p className="error-msg">{loginError}</p>}
-            <a href="#">Forgot your password?</a>
-            <button type="submit">Sign In</button>
+            <a href="#">Құпия сөзді ұмыттыңыз ба?</a>
+            <button type="submit">Кіру</button>
           </form>
         </div>
 
         {/* Sign Up Form */}
         <div className="form-panel sign-up">
           <form onSubmit={handleRegister}>
-            <h1 className="text-2xl font-mono text-accent mb-4">Create Account</h1>
-            <span>use your email for registration</span>
+            <h1 className="text-2xl font-mono text-accent mb-4">Аккаунт құру</h1>
+            <span>Тіркеу үшін электрондық поштаңызды қолданыңыз</span>
+            <div style={{ display: "flex", gap: 8, width: "100%" }}>
+              <input
+                type="text"
+                placeholder="Аты"
+                value={regFirstName}
+                onChange={(e) => setRegFirstName(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Тегі"
+                value={regLastName}
+                onChange={(e) => setRegLastName(e.target.value)}
+                required
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="Курс (мысалы, 4-ші курс)"
+              value={regCourse}
+              onChange={(e) => setRegCourse(e.target.value)}
+            />
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Электрондық пошта"
               value={regEmail}
               onChange={(e) => setRegEmail(e.target.value)}
               required
             />
             <input
               type="password"
-              placeholder="Password (min 6 chars)"
+              placeholder="Құпия сөз (минимум 6 таңба)"
               value={regPass}
               onChange={(e) => setRegPass(e.target.value)}
               required
               minLength={6}
             />
             {regError && <p className="error-msg">{regError}</p>}
-            <button type="submit">Sign Up</button>
+            <button type="submit">Тіркелу</button>
           </form>
         </div>
 
@@ -96,17 +121,17 @@ export default function AuthPage() {
         <div className="toggle-panel-wrap">
           <div className="toggle-inner">
             <div className="toggle-side left">
-              <h1>Welcome Back!</h1>
-              <p>Enter your personal details to use all site features</p>
+              <h1>Қайта қош келдіңіз!</h1>
+              <p>Сайттың барлық мүмкіндіктерін пайдалану үшін жеке деректеріңізді енгізіңіз</p>
               <button className="ghost" onClick={() => setActive(false)}>
-                Sign In
+                Кіру
               </button>
             </div>
             <div className="toggle-side right">
-              <h1>Hello, Doctor!</h1>
-              <p>Register to start practicing with clinical simulations</p>
+              <h1>Сәлеметсіз бе, дәрігер!</h1>
+              <p>Клиникалық симуляциялармен жұмыс істеуге тіркеліңіз</p>
               <button className="ghost" onClick={() => setActive(true)}>
-                Sign Up
+                Тіркелу
               </button>
             </div>
           </div>

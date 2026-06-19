@@ -55,22 +55,23 @@ export default function Header() {
               to={user.role === "ADMIN" ? "/admin" : "/dashboard"}
               className="text-muted hover:text-text transition-colors"
             >
-              {user.role === "ADMIN" ? "Admin" : "Dashboard"}
+              {user.role === "ADMIN" ? "Әкімші" : "Басты бет"}
             </Link>
-            <Link to="/progress" className="text-muted hover:text-text transition-colors">Progress</Link>
-            <Link to="/profile" className="text-muted hover:text-text transition-colors">Profile</Link>
+            <Link to="/progress" className="text-muted hover:text-text transition-colors">Прогресс</Link>
+            <Link to="/ai" className="text-muted hover:text-text transition-colors">ЖИ зертханасы</Link>
+            <Link to="/profile" className="text-muted hover:text-text transition-colors">Профиль</Link>
             <button onClick={handleLogout} className="text-muted hover:text-text transition-colors">
-              Log out
+              Шығу
             </button>
             <span className="text-xs text-muted hidden sm:inline">{user.email}</span>
           </>
         ) : (
           <>
             <Link to="/login" className="text-muted hover:text-text transition-colors">
-              Log in
+              Кіру
             </Link>
             <Link to="/register" className="text-accent hover:text-text transition-colors">
-              Sign up
+              Тіркелу
             </Link>
           </>
         )}

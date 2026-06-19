@@ -5,13 +5,16 @@ interface User {
   id: string;
   email: string;
   role: "STUDENT" | "ADMIN";
+  firstName?: string;
+  lastName?: string;
+  course?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, firstName?: string, lastName?: string, course?: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -33,8 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser({ ...data.user, role: data.user.role as "STUDENT" | "ADMIN" });
   };
 
-  const register = async (email: string, password: string) => {
-    const data = await api.auth.register(email, password);
+  const register = async (email: string, password: string, firstName?: string, lastName?: string, course?: string) => {
+    const data = await api.auth.register(email, password, firstName, lastName, course);
     setUser({ ...data.user, role: data.user.role as "STUDENT" | "ADMIN" });
   };
 
