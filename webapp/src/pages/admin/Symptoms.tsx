@@ -126,7 +126,12 @@ export default function AdminSymptoms() {
                 <div className="flex flex-wrap gap-1 mt-2">
                   {(s.attachments || []).map((a, i) => (
                     <div key={i} className="flex items-center gap-1 text-xs bg-surface border border-border rounded px-2 py-0.5">
-                      <a href={a.path} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">📎 {a.name}</a>
+                      <a href={a.path} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline inline-flex items-center gap-1">
+                        <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                        </svg>
+                        {a.name}
+                      </a>
                       <button onClick={() => handleDeleteAttachment(s.id, i)} className="text-muted hover:text-red-400 ml-1">×</button>
                     </div>
                   ))}

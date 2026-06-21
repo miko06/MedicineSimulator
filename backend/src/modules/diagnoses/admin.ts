@@ -12,7 +12,7 @@ export const adminDiagnosesModule = new Elysia({
       orderBy: { createdAt: "desc" },
       include: {
         specialty: {
-          select: { id: true, slug: true, nameEn: true, nameRu: true },
+          select: { id: true, slug: true, nameEn: true, nameRu: true, nameKz: true },
         },
       },
     });
@@ -22,7 +22,7 @@ export const adminDiagnosesModule = new Elysia({
       where: { id: params.id },
       include: {
         specialty: {
-          select: { id: true, slug: true, nameEn: true, nameRu: true },
+          select: { id: true, slug: true, nameEn: true, nameRu: true, nameKz: true },
         },
       },
     });

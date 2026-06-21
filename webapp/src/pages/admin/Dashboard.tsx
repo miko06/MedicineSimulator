@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">Жүктелуде...</div>;
   }
 
   if (!data) return null;
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
               <tbody>
                 {data.exercisesBySpecialty.map((s) => (
                   <tr key={s.id} className="border-b border-border/50">
-                    <td className="px-4 py-2.5 text-text">{s.nameEn}</td>
+                    <td className="px-4 py-2.5 text-text">{s.nameKz || s.nameRu || s.nameEn}</td>
                     <td className="px-4 py-2.5 text-right font-mono">{s.exerciseCount}</td>
                   </tr>
                 ))}

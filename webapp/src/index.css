@@ -2,34 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── MedSim accessible medical palette ── */
 :root {
-  --bg: #FFFFFF;
-  --bg-rgb: 255 255 255;
-  --surface: #F5F5F5;
-  --surface-rgb: 245 245 245;
-  --border: #D4D4D4;
-  --border-rgb: 212 212 212;
-  --muted: #6B6B6B;
-  --muted-rgb: 107 107 107;
-  --text: #171717;
-  --text-rgb: 23 23 23;
-  --accent: #0A0A0A;
-  --accent-rgb: 10 10 10;
+  --bg: #F0FDFA;
+  --bg-rgb: 240 253 250;
+  --surface: #FFFFFF;
+  --surface-rgb: 255 255 255;
+  --surface-alpha: 0.92;
+  --border: #99F6E4;
+  --border-rgb: 153 246 228;
+  --muted: #0F766E;
+  --muted-rgb: 15 118 110;
+  --text: #134E4A;
+  --text-rgb: 19 78 74;
+  --accent: #0891B2;
+  --accent-rgb: 8 145 178;
+  --accent-contrast: #FFFFFF;
+  --primary: #0891B2;
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --info: #2563EB;
+  --chart-1: #0891B2;
+  --chart-2: #22C55E;
+  --chart-3: #F59E0B;
+  --chart-4: #EF4444;
+  --chart-5: #8B5CF6;
+  --chart-6: #EC4899;
 }
 
 :root.dark {
-  --bg: #0A0A0A;
-  --bg-rgb: 10 10 10;
-  --surface: #171717;
-  --surface-rgb: 23 23 23;
-  --border: #2A2A2A;
-  --border-rgb: 42 42 42;
-  --muted: #888888;
-  --muted-rgb: 136 136 136;
-  --text: #E4E4E4;
-  --text-rgb: 228 228 228;
-  --accent: #FAFAFA;
-  --accent-rgb: 250 250 250;
+  --bg: #081C1C;
+  --bg-rgb: 8 28 28;
+  --surface: #0F2E2E;
+  --surface-rgb: 15 46 46;
+  --surface-alpha: 0.85;
+  --border: #115E59;
+  --border-rgb: 17 94 89;
+  --muted: #5EEAD4;
+  --muted-rgb: 94 234 212;
+  --text: #F0FDFA;
+  --text-rgb: 240 253 250;
+  --accent: #22D3EE;
+  --accent-rgb: 34 211 238;
+  --accent-contrast: #082F49;
+  --primary: #22D3EE;
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --info: #60A5FA;
+  --chart-1: #22D3EE;
+  --chart-2: #4ADE80;
+  --chart-3: #FBBF24;
+  --chart-4: #F87171;
+  --chart-5: #A78BFA;
+  --chart-6: #F472B6;
 }
 
 * {
@@ -43,6 +70,29 @@ body {
   color: var(--text);
   font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ── Accessible interaction defaults ── */
+button,
+a,
+select,
+summary,
+input[type="file"],
+input[type="checkbox"],
+input[type="radio"],
+[role="button"] {
+  cursor: pointer;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
 }
 
 #root {
@@ -62,10 +112,18 @@ body {
 
 @layer utilities {
   .glass {
-    background: rgb(var(--surface-rgb) / 0.85);
+    background: rgb(var(--surface-rgb) / var(--surface-alpha));
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border);
+  }
+
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .animation-delay-150 {

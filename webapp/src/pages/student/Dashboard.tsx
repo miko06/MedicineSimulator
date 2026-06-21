@@ -22,7 +22,7 @@ export default function StudentDashboard() {
   }, [version]);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">Loading...</div>;
+    return <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">Жүктелуде...</div>;
   }
 
   const totalDone = progress?.summary.completedAttempts ?? 0;
@@ -32,7 +32,7 @@ export default function StudentDashboard() {
   return (
     <div className="max-w-5xl mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-xl font-mono text-accent mb-1">Қош келдіңіз, {user?.email}</h1>
+        <h1 className="text-2xl font-heading font-semibold text-text mb-1">Қош келдіңіз, {user?.email}</h1>
         <p className="text-sm text-muted">Жаттығуды бастау үшін мамандықты таңдаңыз</p>
       </div>
 
@@ -55,7 +55,7 @@ export default function StudentDashboard() {
               to={`/exercises?specialty=${s.slug}`}
               className="glass rounded-lg p-4 hover:border-accent/30 transition-all group"
             >
-              <span className="text-2xl">{s.icon}</span>
+              <MedicalIcon className="w-8 h-8 text-accent" />
               <h3 className="text-sm text-text mt-2 group-hover:text-accent transition-colors">{s.name}</h3>
               <p className="text-xs text-muted mt-1">{s.exerciseCount} жаттығу</p>
             </Link>
@@ -64,6 +64,14 @@ export default function StudentDashboard() {
       </div>
     </div>
   )
+}
+
+function MedicalIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2v20M2 12h20" />
+    </svg>
+  );
 }
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {

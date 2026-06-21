@@ -121,8 +121,8 @@ async function openaiChat(
 const SYSTEM_MED = {
   role: "system",
   content:
-    "You are an AI medical education assistant for MedSim — a clinical simulation platform. " +
-    "Students practice diagnosing surgical conditions. Answer in the language the user writes in (Russian, English, or Kazakh). " +
+    "You are an AI medical education assistant for MedSim — a clinical simulation platform used by Kazakh-speaking medical students. " +
+    "Answer in Kazakh by default. If the user explicitly writes in Russian or English, you may switch to that language. " +
     "Be precise, educational, and reference specific symptoms, signs, and diagnostic reasoning. " +
     "When analyzing a case, follow this structure: 1) Key symptoms and their significance, " +
     "2) Differential diagnosis with reasoning, 3) Most likely diagnosis with explanation, " +
@@ -132,9 +132,10 @@ const SYSTEM_MED = {
 const SYSTEM_CHAT = {
   role: "system",
   content:
-    "You are a helpful medical tutor for students using MedSim — a clinical simulation platform. " +
+    "You are a helpful medical tutor for Kazakh-speaking students using MedSim — a clinical simulation platform. " +
     "You help students understand surgical conditions, interpret symptoms, analyze diagnostic images conceptually, " +
-    "and improve their clinical reasoning. Answer in the student's language. Be encouraging but accurate. " +
+    "and improve their clinical reasoning. Answer in Kazakh by default. If the user explicitly writes in Russian or English, switch to that language. " +
+    "Be encouraging but accurate. " +
     "If you're unsure, say so. Never fabricate patient data or give definitive diagnoses without sufficient information. " +
     "Focus on teaching the reasoning process, not just giving answers. Keep answers concise.",
 };
@@ -142,7 +143,7 @@ const SYSTEM_CHAT = {
 const SYSTEM_DIAGNOSE = {
   role: "system",
   content:
-    "You are an expert diagnostician AI for MedSim. A student submits symptoms and test results. " +
+    "You are an expert diagnostician AI for MedSim, used by Kazakh-speaking medical students. A student submits symptoms and test results. " +
     "Your job: perform a structured differential diagnosis. " +
     "1) List the key findings from the provided information. " +
     "2) Generate 3-5 possible diagnoses ranked by likelihood. " +
@@ -150,7 +151,7 @@ const SYSTEM_DIAGNOSE = {
     "4) Recommend what additional tests would help narrow the diagnosis. " +
     "5) State the most likely diagnosis with confidence level. " +
     "Be specific, use medical terminology appropriately, and explain your reasoning step by step. " +
-    "Answer in the student's language.",
+    "Answer in Kazakh by default. If the user explicitly writes in Russian or English, switch to that language.",
 };
 
 export const aiModule = new Elysia({ prefix: "/api/ai" })
@@ -235,9 +236,35 @@ export const aiModule = new Elysia({ prefix: "/api/ai" })
         include: {
           exercise: {
             include: {
-              exerciseSymptoms: { include: { symptom: true } },
+              exerciseSymptoms: {
+                include: {
+                  symptom: {
+                    select: {
+                      nameEn: true,
+                      nameRu: true,
+                      nameKz: true,
+                      descriptionEn: true,
+                      descriptionRu: true,
+                      descriptionKz: true,
+                      severity: true,
+                      bodyZone: true,
+                    },
+                  },
+                },
+              },
               exerciseDiagnoses: {
-                include: { diagnosis: true },
+                include: {
+                  diagnosis: {
+                    select: {
+                      nameEn: true,
+                      nameRu: true,
+                      nameKz: true,
+                      descriptionEn: true,
+                      descriptionRu: true,
+                      descriptionKz: true,
+                    },
+                  },
+                },
                 where: { isCorrect: true },
               },
             },
@@ -248,36 +275,42 @@ export const aiModule = new Elysia({ prefix: "/api/ai" })
 
       if (!attempt) throw new NotFoundError("Attempt");
 
+      const locText = (en: string, ru: string, kz: string) => kz || ru || en;
+
       const symptoms = attempt.exercise.exerciseSymptoms
         .map(
           (es) =>
-            `- ${es.symptom.nameEn}: ${es.symptom.descriptionEn} (severity: ${es.symptom.severity}/10, zone: ${es.symptom.bodyZone})`
+            `- ${locText(es.symptom.nameEn, es.symptom.nameRu, es.symptom.nameKz)}: ${locText(
+                es.symptom.descriptionEn,
+                es.symptom.descriptionRu,
+                es.symptom.descriptionKz
+              )} (ауырлық: ${es.symptom.severity}/10, аймақ: ${es.symptom.bodyZone})`
         )
         .join("\n");
 
       const correctDiagnosis = attempt.exercise.exerciseDiagnoses[0]?.diagnosis;
       const studentAnswers = attempt.answers.map((a) => a.diagnosisId).join(", ");
 
-      const prompt = `The student attempted to diagnose this clinical case and got it wrong. Here's the case:
+      const prompt = `Студент осы клиникалық жағдайды диагностикалауға тырысты және қате жауап берді. Жағдай:
 
-SYMPTOMS:
+БЕЛГІЛЕР:
 ${symptoms}
 
-CORRECT DIAGNOSIS: ${correctDiagnosis?.nameEn || "Unknown"}
-${correctDiagnosis?.descriptionEn || ""}
+ДҰРЫС ДИАГНОЗ: ${locText(correctDiagnosis?.nameEn || "", correctDiagnosis?.nameRu || "", correctDiagnosis?.nameKz || "")}
+${locText(correctDiagnosis?.descriptionEn || "", correctDiagnosis?.descriptionRu || "", correctDiagnosis?.descriptionKz || "")}
 
-STUDENT'S ANSWER(S): ${studentAnswers || "No answer submitted"}
+СТУДЕНТТІҢ ЖАУАБЫ: ${studentAnswers || "Жауап берілмеді"}
 
-STUDENT'S SCORE: ${attempt.score}%
+СТУДЕНТТІҢ БАЛЛЫ: ${attempt.score}%
 
-Please analyze:
-1. What key symptoms did the student likely miss or misinterpret?
-2. Why is the correct diagnosis the right one based on these symptoms?
-3. What clinical reasoning process should lead to the correct diagnosis?
-4. What are the typical diagnostic pitfalls for this condition?
-5. How can the student improve their diagnostic approach?
+Талдау жасаңыз:
+1. Қандай маңызды белгілерді студент байқамауы мүмкін немесе қате түсіндіруі мүмкін?
+2. Неліктен дұрыс диагноз осы белгілерге сәйкес?
+3. Дұрыс диагнозға әкелуі тиіс клиникалық ойлау процесі қандай?
+4. Бұл ауру үшін типтік диагностикалық қателіктер қандай?
+5. Студент диагностикалық тәсілін қалай жақсарта алады?
 
-Be educational and encouraging. The student is learning.`;
+Білім беру мақсатында ынталандырып, қазақ тілінде жауап беріңіз.`;
 
       const reply = await openaiChat([
         SYSTEM_MED as ChatMessage,

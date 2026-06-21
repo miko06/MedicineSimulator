@@ -11,21 +11,24 @@ export default function AIDashboard() {
       <h1 className="text-xl font-mono text-accent mb-6">ЖИ диагноз зертханасы</h1>
 
       <div className="flex gap-1 mb-6 border-b border-border">
-        {(["chat", "errors", "diagnose"] as Tab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`px-4 py-2 text-sm transition-colors border-b-2 -mb-[1px] ${
-              tab === t
-                ? "border-accent text-accent"
-                : "border-transparent text-muted hover:text-text"
-            }`}
-          >
-            {t === "chat" && "💬 Чат"}
-            {t === "errors" && "🔍 Қателік талдауы"}
-            {t === "diagnose" && "🩺 ЖИ диагнозы"}
-          </button>
-        ))}
+          {[
+            { id: "chat", label: "Чат", icon: ChatIcon },
+            { id: "errors", label: "Қателік талдауы", icon: SearchIcon },
+            { id: "diagnose", label: "ЖИ диагнозы", icon: StethoscopeIcon },
+          ].map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setTab(id as Tab)}
+              className={`flex items-center gap-2 px-4 py-2 text-sm transition-colors border-b-2 -mb-[1px] focus-ring ${
+                tab === id
+                  ? "border-accent text-accent"
+                  : "border-transparent text-muted hover:text-text"
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
       </div>
 
       {tab === "chat" && <ChatTab />}
@@ -73,7 +76,7 @@ function ChatTab() {
   };
 
   const saveConvo = async (msgs: Array<{ role: string; content: string }>) => {
-    const title = msgs.find((m) => m.role === "user")?.content?.slice(0, 50) || "New Chat";
+    const title = msgs.find((m) => m.role === "user")?.content?.slice(0, 50) || "Жаңа чат";
     if (convoId) {
       await fetch(`/api/ai/conversations/${convoId}`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
@@ -110,9 +113,9 @@ function ChatTab() {
         body: JSON.stringify({ messages: updated.slice(0, -1) }),
       });
 
-      if (!res.ok) throw new Error("Stream failed");
+      if (!res.ok) throw new Error("Ағын сәтсіз");
       const reader = res.body?.getReader();
-      if (!reader) throw new Error("No reader");
+      if (!reader) throw new Error("Оқырман жоқ");
       const decoder = new TextDecoder();
       let buffer = "";
       let finalMessages = updated;
@@ -214,6 +217,31 @@ function ChatTab() {
   );
 }
 
+function ChatIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
+  );
+}
+
+function StethoscopeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  );
+}
+
 function ErrorAnalysisTab() {
   const [searchParams] = useSearchParams();
   const [attemptId, setAttemptId] = useState(searchParams.get("attempt") ?? "");
@@ -239,7 +267,7 @@ function ErrorAnalysisTab() {
         body: JSON.stringify({ symptoms: `Attempt ${attemptId}`, result: data.reply }),
       });
     } catch {
-      setAnalysis("Error loading analysis.");
+      setAnalysis("Талдауды жүктеу қатесі.");
     } finally { setLoading(false); }
   };
 
@@ -283,7 +311,7 @@ function DiagnoseTab() {
     setLoading(true);
     try {
       let prompt = symptoms;
-      if (notes.trim()) prompt += "\n\nNotes:\n" + notes;
+      if (notes.trim()) prompt += "\n\nҚосымша жазбалар:\n" + notes;
       if (files.length > 0) prompt += `\n\n[${files.length} file(s) attached: ${files.map(f => f.name).join(", ")}]`;
 
       const res = await fetch("/api/ai/diagnose", {
@@ -303,7 +331,7 @@ function DiagnoseTab() {
       const d = await r.json();
       setHistory(d.diagnoses || []);
     } catch {
-      setResult("Error. Try again.");
+      setResult("Қате. Қайтадан көріңіз.");
     } finally { setLoading(false); }
   };
 

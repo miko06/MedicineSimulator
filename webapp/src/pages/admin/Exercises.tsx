@@ -6,11 +6,13 @@ interface Exercise {
   id: string;
   titleEn: string;
   titleRu: string;
+  titleKz?: string;
   difficulty: string;
   specialty: { id: string; slug: string; nameEn: string; nameRu: string; nameKz?: string };
   specialtyId: string;
   descriptionEn: string;
   descriptionRu: string;
+  descriptionKz?: string;
   images: string[];
   robotPreset?: { zoneOverrides: unknown[] };
   exerciseSymptoms?: Array<{ symptom: { id: string; nameEn: string } }>;
@@ -189,7 +191,9 @@ export default function AdminExercises() {
                     <ul className="text-xs text-text space-y-1 mb-2">
                       {imageFiles.map((f) => (
                         <li key={f.name} className="flex items-center gap-2">
-                          <span className="text-accent">📎</span>
+                          <svg className="w-3 h-3 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                          </svg>
                           {f.name}
                         </li>
                       ))}
@@ -227,7 +231,7 @@ export default function AdminExercises() {
           <tbody>
             {exercises.map((ex) => (
               <tr key={ex.id} className="border-b border-border/50 hover:bg-surface/50">
-                <td className="px-4 py-3 text-text">{ex.titleEn}</td>
+                <td className="px-4 py-3 text-text">{ex.titleKz || ex.titleRu || ex.titleEn}</td>
                 <td className="px-4 py-3 text-muted">{ex.specialty?.nameKz || ex.specialty?.nameRu || ex.specialty?.nameEn}</td>
                 <td className="px-4 py-3">
                   <span className={`text-xs px-2 py-0.5 rounded ${ex.difficulty === "BEGINNER" ? "bg-green-400/10 text-green-400" : ex.difficulty === "INTERMEDIATE" ? "bg-yellow-400/10 text-yellow-400" : "bg-red-400/10 text-red-400"}`}>{ex.difficulty === "BEGINNER" ? "Қарапайым" : ex.difficulty === "INTERMEDIATE" ? "Орташа" : "Күрделі"}</span>

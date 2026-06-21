@@ -11,9 +11,19 @@ export const adminExercisesModule = new Elysia({
   .get("/", async () => {
     return prisma.exercise.findMany({
       orderBy: { createdAt: "desc" },
-      include: {
+      select: {
+        id: true,
+        titleEn: true,
+        titleRu: true,
+        titleKz: true,
+        descriptionEn: true,
+        descriptionRu: true,
+        descriptionKz: true,
+        difficulty: true,
+        specialtyId: true,
+        images: true,
         specialty: {
-          select: { id: true, slug: true, nameEn: true, nameRu: true },
+          select: { id: true, slug: true, nameEn: true, nameRu: true, nameKz: true },
         },
         _count: {
           select: {

@@ -258,6 +258,6 @@ export interface AdminDashboard {
   users: { total: number; students: number; admins: number; active: number };
   content: { specialties: number; exercises: number; symptoms: number; diagnoses: number };
   attempts: { total: number; completed: number; completionRate: number; averageScore: number };
-  exercisesBySpecialty: Array<{ id: string; slug: string; nameEn: string; nameRu: string; exerciseCount: number }>;
+  exercisesBySpecialty: Array<{ id: string; slug: string; nameEn: string; nameRu: string; nameKz: string; exerciseCount: number }>;
   recentActivity: Array<{ id: string; user: string; exercise: string; score: number; status: string }>;
 }

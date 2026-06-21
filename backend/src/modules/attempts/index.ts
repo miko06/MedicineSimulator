@@ -4,6 +4,17 @@ import { requireAuth } from "../../middleware/auth";
 import { i18nPlugin } from "../../middleware/i18n";
 import { NotFoundError } from "../../middleware/error-handler";
 
+function loc(
+  locale: string,
+  en: string | null | undefined,
+  ru: string | null | undefined,
+  kz: string | null | undefined
+): string {
+  if (locale === "ru") return ru || en || "";
+  if (locale === "kz") return kz || ru || en || "";
+  return en || ru || "";
+}
+
 export const attemptsModule = new Elysia({ prefix: "/api/exercises" })
   .use(i18nPlugin)
   .use(requireAuth)
@@ -55,8 +66,6 @@ export const attemptsModule = new Elysia({ prefix: "/api/exercises" })
   .put(
     "/:id/attempt",
     async ({ params, body, currentUser, locale }) => {
-      const isRu = locale === "ru" || locale === "kz";
-
       const attempt = await prisma.attempt.findFirst({
         where: {
           exerciseId: params.id,
@@ -127,13 +136,26 @@ export const attemptsModule = new Elysia({ prefix: "/api/exercises" })
           answerDetails: selectedDiagnosis
             ? {
                 id: selectedDiagnosis.id,
-                name: isRu ? selectedDiagnosis.nameRu : selectedDiagnosis.nameEn,
-                description: isRu
-                  ? selectedDiagnosis.descriptionRu
-                  : selectedDiagnosis.descriptionEn,
-                treatments: isRu
-                  ? selectedDiagnosis.treatmentsRu
-                  : selectedDiagnosis.treatmentsEn,
+                name: loc(
+                  locale,
+                  selectedDiagnosis.nameEn,
+                  selectedDiagnosis.nameRu,
+                  selectedDiagnosis.nameKz
+                ),
+                description: loc(
+                  locale,
+                  selectedDiagnosis.descriptionEn,
+                  selectedDiagnosis.descriptionRu,
+                  selectedDiagnosis.descriptionKz
+                ),
+                treatments: loc(
+                  locale,
+                  (selectedDiagnosis.treatmentsEn as string[] | null)?.join(", ") ?? "",
+                  (selectedDiagnosis.treatmentsRu as string[] | null)?.join(", ") ?? "",
+                  (selectedDiagnosis.treatmentsKz as string[] | null)?.join(", ") ?? ""
+                )
+                  .split(", ")
+                  .filter(Boolean),
               }
             : null,
         };
@@ -144,17 +166,24 @@ export const attemptsModule = new Elysia({ prefix: "/api/exercises" })
           );
 
           if (correctDiagnosis) {
+            const diag = correctDiagnosis.diagnosis;
             response.correctDiagnosis = {
-              id: correctDiagnosis.diagnosis.id,
-              name: isRu
-                ? correctDiagnosis.diagnosis.nameRu
-                : correctDiagnosis.diagnosis.nameEn,
-              description: isRu
-                ? correctDiagnosis.diagnosis.descriptionRu
-                : correctDiagnosis.diagnosis.descriptionEn,
-              treatments: isRu
-                ? correctDiagnosis.diagnosis.treatmentsRu
-                : correctDiagnosis.diagnosis.treatmentsEn,
+              id: diag.id,
+              name: loc(locale, diag.nameEn, diag.nameRu, diag.nameKz),
+              description: loc(
+                locale,
+                diag.descriptionEn,
+                diag.descriptionRu,
+                diag.descriptionKz
+              ),
+              treatments: loc(
+                locale,
+                (diag.treatmentsEn as string[] | null)?.join(", ") ?? "",
+                (diag.treatmentsRu as string[] | null)?.join(", ") ?? "",
+                (diag.treatmentsKz as string[] | null)?.join(", ") ?? ""
+              )
+                .split(", ")
+                .filter(Boolean),
             };
           }
         }

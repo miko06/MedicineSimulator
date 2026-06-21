@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { api } from "../../api/client";
 
 interface DiagnosisRecord {
-  id: string; nameEn: string; nameRu: string; specialty: { id: string; slug: string; nameEn: string; nameRu: string; nameKz?: string };
-  specialtyId: string; descriptionEn: string; descriptionRu: string;
-  treatmentsEn: string[]; treatmentsRu: string[];
+  id: string; nameEn: string; nameRu: string; nameKz?: string; specialty: { id: string; slug: string; nameEn: string; nameRu: string; nameKz?: string };
+  specialtyId: string; descriptionEn: string; descriptionRu: string; descriptionKz?: string;
+  treatmentsEn: string[]; treatmentsRu: string[]; treatmentsKz?: string[];
 }
 
 interface SpecialtyShort { id: string; slug: string; nameEn: string; nameRu: string; nameKz?: string; }
@@ -101,7 +101,7 @@ export default function AdminDiagnoses() {
           <tbody>
             {diagnoses.map((d) => (
               <tr key={d.id} className="border-b border-border/50 hover:bg-surface/50">
-                <td className="px-4 py-3 text-text">{d.nameEn}</td>
+                <td className="px-4 py-3 text-text">{d.nameKz || d.nameRu || d.nameEn}</td>
                 <td className="px-4 py-3 text-muted text-xs">{d.specialty?.nameKz || d.specialty?.nameRu || d.specialty?.nameEn}</td>
                 <td className="px-4 py-3 text-right">
                   <button onClick={() => { setEditing(d); setForm({ nameEn: d.nameEn, nameRu: d.nameRu, specialtyId: d.specialtyId, descriptionEn: d.descriptionEn, descriptionRu: d.descriptionRu, treatmentsEn: (d.treatmentsEn||[]).join(", "), treatmentsRu: (d.treatmentsRu||[]).join(", ") }); setShowForm(true); }} className="text-xs text-muted hover:text-text mr-3">Өңдеу</button>

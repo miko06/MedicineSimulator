@@ -109,7 +109,17 @@ export const exercisesModule = new Elysia({ prefix: "/api/exercises" })
         });
         const correctIdx = diagnoses.findIndex(d => d.isCorrect);
 
-        const treatments = (correctDiag ? (loc(locale, "", (correctDiag.treatmentsRu as string[] || []).join(", "), "") || (correctDiag.treatmentsEn as string[] || []).join(", ")) : "").split(", ").filter(Boolean);
+        const treatments = (correctDiag
+          ? loc(
+              locale,
+              (correctDiag.treatmentsEn as string[] | null)?.join(", ") ?? "",
+              (correctDiag.treatmentsRu as string[] | null)?.join(", ") ?? "",
+              (correctDiag.treatmentsKz as string[] | null)?.join(", ") ?? ""
+            )
+          : ""
+        )
+          .split(", ")
+          .filter(Boolean);
 
         testSteps = [{
           type: "diagnosis",
@@ -120,7 +130,11 @@ export const exercisesModule = new Elysia({ prefix: "/api/exercises" })
 
         if (treatments.length >= 2) {
           const correctTx = treatments[0]!;
-          const wrongTx = ["Observation only", "Symptomatic treatment", "No treatment needed"];
+          const wrongTx = [
+            loc(locale, "Observation only", "Только наблюдение", "Тек қана бақылау"),
+            loc(locale, "Symptomatic treatment", "Симптоматическое лечение", "Симптоматикалық емдеу"),
+            loc(locale, "No treatment needed", "Лечение не требуется", "Емдеу қажет емес"),
+          ];
           testSteps.push({
             type: "treatment",
             title: loc(locale, "Choose the correct treatment", "Выберите правильное лечение", "Дұрыс емдеуді таңдаңыз"),

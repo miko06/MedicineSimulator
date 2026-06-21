@@ -35,7 +35,7 @@ export const adminDashboardModule = new Elysia({ prefix: "/api/admin" })
         orderBy: { createdAt: "desc" },
         include: {
           user: { select: { id: true, email: true } },
-          exercise: { select: { id: true, titleEn: true } },
+          exercise: { select: { id: true, titleEn: true, titleRu: true, titleKz: true } },
         },
       }),
       prisma.attempt.aggregate({
@@ -47,6 +47,7 @@ export const adminDashboardModule = new Elysia({ prefix: "/api/admin" })
           slug: true,
           nameEn: true,
           nameRu: true,
+          nameKz: true,
           _count: { select: { exercises: true } },
         },
         orderBy: { sortOrder: "asc" },
@@ -82,12 +83,13 @@ export const adminDashboardModule = new Elysia({ prefix: "/api/admin" })
         slug: s.slug,
         nameEn: s.nameEn,
         nameRu: s.nameRu,
+        nameKz: s.nameKz,
         exerciseCount: s._count.exercises,
       })),
       recentActivity: recentAttempts.map((a) => ({
         id: a.id,
         user: a.user.email,
-        exercise: a.exercise.titleEn,
+        exercise: a.exercise.titleKz || a.exercise.titleRu || a.exercise.titleEn,
         score: a.score,
         status: a.status,
         createdAt: a.createdAt,

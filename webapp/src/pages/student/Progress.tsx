@@ -2,9 +2,30 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, type ProgressData } from "../../api/client";
 import { useLocale } from "../../hooks/useLocale";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  CartesianGrid,
+  LabelList,
+} from "recharts";
 
-const COLORS = ["#888888", "#AAAAAA", "#CCCCCC", "#666666", "#999999", "#BBBBBB"];
+const CHART_COLORS = [
+  "#0891B2",
+  "#22C55E",
+  "#F59E0B",
+  "#EF4444",
+  "#8B5CF6",
+  "#EC4899",
+];
 
 export default function Progress() {
   const [progress, setProgress] = useState<ProgressData | null>(null);
@@ -27,24 +48,49 @@ export default function Progress() {
     }
   };
 
-  if (loading) return <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] text-muted text-sm">
+        Жүктелуде...
+      </div>
+    );
   if (!progress) return null;
 
   const { summary, bySpecialty, recentAttempts } = progress;
 
-  const pieData = bySpecialty.filter(s => s.total > 0).map(s => ({ name: s.nameEn, value: s.total }));
+  const pieData = bySpecialty
+    .filter((s) => s.total > 0)
+    .map((s) => ({ name: s.nameEn, value: s.total }));
 
-  const barData = bySpecialty.filter(s => s.total > 0).map(s => ({ name: s.nameEn, Score: s.averageScore, Completed: s.completed, Total: s.total }));
+  const barData = bySpecialty
+    .filter((s) => s.total > 0)
+    .map((s) => ({
+      name: s.nameEn,
+      Score: s.averageScore,
+    }));
 
-  const lineData = recentAttempts.slice().reverse().map((a, i) => ({ name: `#${i + 1}`, score: a.score, time: a.timeSpent }));
+  const lineData = recentAttempts
+    .slice()
+    .reverse()
+    .map((a, i) => ({ name: `#${i + 1}`, score: a.score, time: a.timeSpent }));
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-xl font-mono text-accent">Прогресс</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <h1 className="text-2xl font-heading font-semibold text-text">Прогресс</h1>
         <div className="flex items-center gap-4">
-          <Link to="/history/errors" className="text-xs text-muted hover:text-text transition-colors">Қателер тарихы →</Link>
-          <Link to="/ai" className="text-xs text-muted hover:text-text transition-colors">ЖИ зертханасына өту →</Link>
+          <Link
+            to="/history/errors"
+            className="text-xs text-muted hover:text-accent transition-colors"
+          >
+            Қателер тарихы →
+          </Link>
+          <Link
+            to="/ai"
+            className="text-xs text-muted hover:text-accent transition-colors"
+          >
+            ЖИ зертханасына өту →
+          </Link>
         </div>
       </div>
 
@@ -58,13 +104,39 @@ export default function Progress() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {pieData.length > 0 && (
           <div className="glass rounded-xl p-6">
-            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Мамандықтар бойынша жаттығулар</h3>
+            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">
+              Мамандықтар бойынша жаттығулар
+            </h3>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={4} dataKey="value">
-                  {pieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="var(--border)" />)}
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={55}
+                  outerRadius={90}
+                  paddingAngle={4}
+                  dataKey="value"
+                >
+                  {pieData.map((_, i) => (
+                    <Cell
+                      key={i}
+                      fill={CHART_COLORS[i % CHART_COLORS.length]}
+                      stroke="var(--bg)"
+                      strokeWidth={2}
+                    />
+                  ))}
                 </Pie>
-                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    color: "var(--text)",
+                  }}
+                  itemStyle={{ color: "var(--text)" }}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -72,14 +144,39 @@ export default function Progress() {
 
         {barData.length > 0 && (
           <div className="glass rounded-xl p-6">
-            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Мамандықтар бойынша нәтиже</h3>
+            <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">
+              Мамандықтар бойынша нәтиже
+            </h3>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={barData}>
+              <BarChart data={barData} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "var(--muted)" }} />
-                <YAxis tick={{ fontSize: 10, fill: "var(--muted)" }} />
-                <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
-                <Bar dataKey="Score" fill="#AAAAAA" radius={[4, 4, 0, 0]} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 10, fill: "var(--muted)" }}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  tick={{ fontSize: 10, fill: "var(--muted)" }}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    fontSize: 12,
+                    color: "var(--text)",
+                  }}
+                  cursor={{ fill: "var(--border)", opacity: 0.3 }}
+                />
+                <Bar dataKey="Score" fill="var(--accent)" radius={[4, 4, 0, 0]}>
+                  <LabelList
+                    dataKey="Score"
+                    position="top"
+                    formatter={(v) => `${v}%`}
+                    fill="var(--muted)"
+                    fontSize={10}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -88,21 +185,46 @@ export default function Progress() {
 
       {lineData.length > 1 && (
         <div className="glass rounded-xl p-6 mb-8">
-          <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">Соңғы балл динамикасы</h3>
+          <h3 className="text-xs font-mono text-muted uppercase tracking-wider mb-4">
+            Соңғы балл динамикасы
+          </h3>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={lineData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="name" tick={{ fontSize: 10, fill: "var(--muted)" }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 10, fill: "var(--muted)" }} />
-              <Tooltip contentStyle={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="score" stroke="#888888" strokeWidth={2} dot={{ r: 3 }} />
+              <XAxis
+                dataKey="name"
+                tick={{ fontSize: 10, fill: "var(--muted)" }}
+              />
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fontSize: 10, fill: "var(--muted)" }}
+              />
+              <Tooltip
+                contentStyle={{
+                  background: "var(--surface)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  color: "var(--text)",
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="score"
+                stroke="var(--accent)"
+                strokeWidth={3}
+                dot={{ r: 4, fill: "var(--accent)", strokeWidth: 2, stroke: "var(--bg)" }}
+                activeDot={{ r: 6 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
       )}
 
       <div className="glass rounded-xl overflow-hidden">
-        <h3 className="text-xs font-mono text-muted uppercase tracking-wider px-4 py-3 border-b border-border">Соңғы әрекеттер</h3>
+        <h3 className="text-xs font-mono text-muted uppercase tracking-wider px-4 py-3 border-b border-border">
+          Соңғы әрекеттер
+        </h3>
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left">
@@ -121,24 +243,31 @@ export default function Progress() {
                 <td className="px-4 py-2.5 text-muted">{a.specialty}</td>
                 <td className="px-4 py-2.5 font-mono">{a.score}%</td>
                 <td className="px-4 py-2.5">
-                  <span className={`text-xs ${a.status === "COMPLETED" ? "text-green-400" : "text-yellow-400"}`}>
+                  <span
+                    className={`text-xs font-medium ${
+                      a.status === "COMPLETED"
+                        ? "text-success"
+                        : "text-warning"
+                    }`}
+                  >
                     {a.status === "COMPLETED" ? "Аяқталды" : "Белсенді"}
                   </span>
                 </td>
                 <td className="px-4 py-2.5">
                   <button
                     onClick={() => copyId(a.id)}
-                    className="font-mono text-xs text-muted hover:text-accent transition-colors"
+                    className="font-mono text-xs text-muted hover:text-accent transition-colors focus-ring rounded"
                     title="Толық идентификаторды көшіру"
                   >
-                    {a.id.slice(0, 8)}… {copiedId === a.id ? "көшірілді" : "көшіру"}
+                    {a.id.slice(0, 8)}…{" "}
+                    {copiedId === a.id ? "көшірілді" : "көшіру"}
                   </button>
                 </td>
                 <td className="px-4 py-2.5">
                   {a.status === "COMPLETED" && a.score < 100 && (
                     <Link
                       to={`/ai?tab=errors&attempt=${a.id}`}
-                      className="text-xs text-accent hover:underline"
+                      className="text-xs text-accent hover:underline focus-ring rounded"
                     >
                       Қатені талдау →
                     </Link>
@@ -155,8 +284,8 @@ export default function Progress() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="glass rounded-lg p-4 text-center">
-      <p className="text-2xl font-mono text-accent">{value}</p>
+    <div className="glass rounded-lg p-4 text-center border-t-4 border-accent hover:border-accent/80 transition-colors">
+      <p className="text-2xl font-heading font-semibold text-accent">{value}</p>
       <p className="text-xs text-muted mt-1">{label}</p>
     </div>
   );
