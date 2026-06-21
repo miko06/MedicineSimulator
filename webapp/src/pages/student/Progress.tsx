@@ -97,8 +97,8 @@ export default function Progress() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         <StatCard label="Барлығы" value={String(summary.totalAttempts)} />
         <StatCard label="Аяқталды" value={String(summary.completedAttempts)} />
-        <StatCard label="Орташа балл" value={`${summary.averageScore}%`} />
-        <StatCard label="Ең жақсы" value={`${summary.bestScore}%`} />
+        <StatCard label="Орташа балл" value={`${summary.averageScore} / 100`} />
+        <StatCard label="Ең жақсы" value={`${summary.bestScore} / 100`} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
@@ -241,7 +241,7 @@ export default function Progress() {
               <tr key={a.id} className="border-t border-border/50">
                 <td className="px-4 py-2.5 text-text">{a.exerciseTitle}</td>
                 <td className="px-4 py-2.5 text-muted">{a.specialty}</td>
-                <td className="px-4 py-2.5 font-mono">{a.score}%</td>
+                <td className="px-4 py-2.5 font-mono">{a.score} / 100</td>
                 <td className="px-4 py-2.5">
                   <span
                     className={`text-xs font-medium ${

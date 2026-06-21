@@ -245,8 +245,12 @@ export default function ExerciseDetailPage() {
             )}
 
             {result && (
-              <div className={`glass rounded-lg p-4 border ${result.isCorrect ? "border-green-400/30" : "border-red-400/30"}`}>
-                <p className={`text-sm font-medium ${result.isCorrect ? "text-green-400" : "text-red-400"}`}>
+              <div className={`glass rounded-lg p-5 border ${result.isCorrect ? "border-green-400/30" : "border-red-400/30"}`}>
+                <p className="text-base font-medium text-accent">Тест тапсырылды</p>
+                <p className="text-2xl font-heading font-semibold text-text mt-2">
+                  Сіздің баллыңыз: {result.score} / 100
+                </p>
+                <p className={`text-sm font-medium mt-2 ${result.isCorrect ? "text-green-400" : "text-red-400"}`}>
                   {result.isCorrect ? "Дұрыс!" : "Қате"}
                 </p>
                 {result.answerDetails && (
@@ -272,6 +276,16 @@ export default function ExerciseDetailPage() {
                     )}
                   </div>
                 )}
+                <button
+                  onClick={() => {
+                    setSelectedAnswer(null);
+                    setResult(null);
+                    startAttempt();
+                  }}
+                  className="mt-5 bg-accent text-bg rounded px-4 py-2 text-sm hover:opacity-90 transition-opacity"
+                >
+                  Қайта тапсыру
+                </button>
               </div>
             )}
 
@@ -326,19 +340,34 @@ function MultiStepTest({
 
   if (completed) {
     const correct = answers.filter((a, i) => a === steps[i]!.correctIndex).length;
+    const score = result?.score ?? Math.round((correct / steps.length) * 100);
     return (
-      <div className="glass rounded-lg p-4 border border-accent/30">
-        <p className="text-sm font-medium text-accent">Тест аяқталды!</p>
+      <div className="glass rounded-lg p-5 border border-accent/30">
+        <p className="text-base font-medium text-accent">Тест тапсырылды</p>
+        <p className="text-2xl font-heading font-semibold text-text mt-2">
+          Сіздің баллыңыз: {score} / 100
+        </p>
         <p className="text-sm text-muted mt-1">
-          {correct} / {steps.length} дұрыс ({Math.round((correct / steps.length) * 100)}%)
+          {correct} / {steps.length} дұрыс жауап
         </p>
         {result && result.correctDiagnosis && (
-          <div className="mt-3 pt-3 border-t border-border">
+          <div className="mt-4 pt-4 border-t border-border">
             <p className="text-xs text-green-400 font-medium">Дұрыс диагноз:</p>
             <p className="text-sm text-text mt-1">{result.correctDiagnosis.name}</p>
             <p className="text-xs text-muted mt-1">{result.correctDiagnosis.description}</p>
           </div>
         )}
+        <button
+          onClick={() => {
+            setStep(0);
+            setAnswers([]);
+            setCompleted(false);
+            startAttempt();
+          }}
+          className="mt-5 bg-accent text-bg rounded px-4 py-2 text-sm hover:opacity-90 transition-opacity"
+        >
+          Қайта тапсыру
+        </button>
       </div>
     );
   }

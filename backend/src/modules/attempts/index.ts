@@ -90,33 +90,57 @@ export const attemptsModule = new Elysia({ prefix: "/api/exercises" })
       }
 
       if (body.answer) {
-        const exerciseDiagnosis = attempt.exercise.exerciseDiagnoses.find(
-          (ed) => ed.diagnosisId === body.answer
-        );
-
-        const isCorrect = exerciseDiagnosis?.isCorrect ?? false;
-
-        await prisma.attemptAnswer.create({
-          data: {
-            attemptId: attempt.id,
-            diagnosisId: body.answer,
-            isCorrect,
-          },
-        });
-
-        const allAnswers = await prisma.attemptAnswer.findMany({
-          where: { attemptId: attempt.id },
-        });
-
-        const correctCount = allAnswers.filter((a) => a.isCorrect).length;
-        const totalAnswers = allAnswers.length;
-        const score =
-          totalAnswers > 0
-            ? Math.round((correctCount / totalAnswers) * 100)
-            : 0;
-
         const timeSpent = body.timeSpent ?? 0;
         const isComplete = body.final === true;
+
+        const testSteps = (attempt.exercise.testSteps as Array<{
+          type: string;
+          title: string;
+          options: string[];
+          correctIndex: number;
+        }> | null) ?? [];
+
+        let isCorrect = false;
+        let score = 0;
+        let selectedDiagnosis = null;
+
+        if (testSteps.length > 0) {
+          // Multi-step test: answer is comma-separated option indices
+          const answerParts = body.answer.split(",").map((v) => Number(v.trim()));
+          const correctCount = testSteps.filter(
+            (s, i) => answerParts[i] === s.correctIndex
+          ).length;
+          score =
+            testSteps.length > 0
+              ? Math.round((correctCount / testSteps.length) * 100)
+              : 0;
+          isCorrect = correctCount === testSteps.length;
+
+          await prisma.attemptAnswer.createMany({
+            data: testSteps.map((s, i) => ({
+              attemptId: attempt.id,
+              diagnosisId: `step-${i}`,
+              isCorrect: answerParts[i] === s.correctIndex,
+            })),
+          });
+        } else {
+          // Single diagnosis answer
+          const exerciseDiagnosis = attempt.exercise.exerciseDiagnoses.find(
+            (ed) => ed.diagnosisId === body.answer
+          );
+
+          isCorrect = exerciseDiagnosis?.isCorrect ?? false;
+          selectedDiagnosis = exerciseDiagnosis?.diagnosis ?? null;
+          score = isCorrect ? 100 : 0;
+
+          await prisma.attemptAnswer.create({
+            data: {
+              attemptId: attempt.id,
+              diagnosisId: body.answer,
+              isCorrect,
+            },
+          });
+        }
 
         await prisma.attempt.update({
           where: { id: attempt.id },
@@ -126,8 +150,6 @@ export const attemptsModule = new Elysia({ prefix: "/api/exercises" })
             timeSpent,
           },
         });
-
-        const selectedDiagnosis = exerciseDiagnosis?.diagnosis;
 
         const response: Record<string, unknown> = {
           isCorrect,

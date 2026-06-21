@@ -63,5 +63,7 @@ export async function cleanDatabase() {
   await prisma.diagnosis.deleteMany();
   await prisma.symptom.deleteMany();
   await prisma.specialty.deleteMany();
+  await prisma.aiDiagnosis.deleteMany();
+  await prisma.aiConversation.deleteMany();
   await prisma.user.deleteMany();
 }
