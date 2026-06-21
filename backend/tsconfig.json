@@ -29,10 +29,7 @@
     "noPropertyAccessFromIndexSignature": false,
 
     // Paths
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    // No path aliases are used; baseUrl is deprecated in TypeScript 6+.
   },
   "include": ["src/**/*.ts", "prisma/**/*.ts"],
   "exclude": ["node_modules", "dist", "src/generated"]
